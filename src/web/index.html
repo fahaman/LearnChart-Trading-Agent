@@ -873,7 +873,7 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
 
             tvChart = LightweightCharts.createChart(container, {
                 layout: {
-                    backgroundColor: '#090B12',
+                    background: { type: 'solid', color: '#090B12' },
                     textColor: '#94A3B8',
                     fontFamily: 'Outfit, sans-serif'
                 },
@@ -886,6 +886,7 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
                 },
                 rightPriceScale: {
                     borderColor: 'rgba(255, 255, 255, 0.08)',
+                    autoScale: true
                 },
                 timeScale: {
                     borderColor: 'rgba(255, 255, 255, 0.08)',
@@ -956,31 +957,47 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
                 if (res.ok) {
                     const data = await res.json();
                     if (data.candles && data.candles.length > 0 && mainSeries) {
-                        const formattedCandles = data.candles.map(c => ({
-                            time: Math.floor(c.t / 1000),
-                            open: c.o,
-                            high: c.h,
-                            low: c.l,
-                            close: c.c,
-                            value: c.c
-                        }));
+                        const rawCandles = data.candles
+                            .map(c => ({
+                                time: Math.floor(c.t / 1000),
+                                open: Number(c.o),
+                                high: Number(c.h),
+                                low: Number(c.l),
+                                close: Number(c.c),
+                                value: Number(c.c)
+                            }))
+                            .filter(c => !isNaN(c.time) && !isNaN(c.close));
+
+                        const candleMap = new Map();
+                        rawCandles.forEach(c => candleMap.set(c.time, c));
+                        const formattedCandles = Array.from(candleMap.values()).sort((a, b) => a.time - b.time);
 
                         mainSeries.setData(formattedCandles);
 
                         if (data.indicators && data.indicators.ema20 && ema20Series) {
-                            const ema20Data = data.candles.map((c, i) => ({
-                                time: Math.floor(c.t / 1000),
-                                value: data.indicators.ema20[i] || c.c
-                            }));
-                            ema20Series.setData(ema20Data);
+                            const emaMap = new Map();
+                            data.candles.forEach((c, i) => {
+                                const t = Math.floor(c.t / 1000);
+                                const val = data.indicators.ema20[i];
+                                if (!isNaN(t) && val !== undefined && val !== null) {
+                                    emaMap.set(t, { time: t, value: Number(val) });
+                                }
+                            });
+                            const sortedEma20 = Array.from(emaMap.values()).sort((a, b) => a.time - b.time);
+                            ema20Series.setData(sortedEma20);
                         }
 
                         if (data.indicators && data.indicators.ema50 && ema50Series) {
-                            const ema50Data = data.candles.map((c, i) => ({
-                                time: Math.floor(c.t / 1000),
-                                value: data.indicators.ema50[i] || c.c
-                            }));
-                            ema50Series.setData(ema50Data);
+                            const emaMap50 = new Map();
+                            data.candles.forEach((c, i) => {
+                                const t = Math.floor(c.t / 1000);
+                                const val = data.indicators.ema50[i];
+                                if (!isNaN(t) && val !== undefined && val !== null) {
+                                    emaMap50.set(t, { time: t, value: Number(val) });
+                                }
+                            });
+                            const sortedEma50 = Array.from(emaMap50.values()).sort((a, b) => a.time - b.time);
+                            ema50Series.setData(sortedEma50);
                         }
 
                         // Banner Stats
