@@ -50,15 +50,27 @@ class HyperliquidAPI:
         """
         self._meta_cache = None
         self._hip3_meta_cache = {}  # {dex_name: meta_response}
-        if "hyperliquid_private_key" in CONFIG and CONFIG["hyperliquid_private_key"]:
-            self.wallet = Account.from_key(CONFIG["hyperliquid_private_key"])
-        elif "mnemonic" in CONFIG and CONFIG["mnemonic"]:
-            Account.enable_unaudited_hdwallet_features()
-            self.wallet = Account.from_mnemonic(CONFIG["mnemonic"])
-        else:
-            raise ValueError(
-                "Either HYPERLIQUID_PRIVATE_KEY/LIGHTER_PRIVATE_KEY or MNEMONIC must be provided"
-            )
+        pk = CONFIG.get("hyperliquid_private_key")
+        mnemonic = CONFIG.get("mnemonic")
+        self.wallet = None
+        
+        if pk and pk.strip() and pk.strip() != "0x0000000000000000000000000000000000000000000000000000000000000000":
+            try:
+                self.wallet = Account.from_key(pk)
+            except Exception as e:
+                logging.warning("Invalid HYPERLIQUID_PRIVATE_KEY provided (%s). Falling back to read-only demo signer.", e)
+        
+        if not self.wallet and mnemonic and mnemonic.strip():
+            try:
+                Account.enable_unaudited_hdwallet_features()
+                self.wallet = Account.from_mnemonic(mnemonic)
+            except Exception as e:
+                logging.warning("Invalid MNEMONIC provided (%s). Falling back to read-only demo signer.", e)
+                
+        if not self.wallet:
+            # Generate a valid random ephemeral wallet for market read queries & demo state
+            self.wallet = Account.create()
+            logging.info("Using ephemeral demo signer wallet: %s", self.wallet.address)
         # Choose base URL: allow override via env-config; fallback to network selection
         network = (CONFIG.get("hyperliquid_network") or "mainnet").lower()
         base_url = CONFIG.get("hyperliquid_base_url")

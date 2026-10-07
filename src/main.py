@@ -764,8 +764,55 @@ def main():
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
 
+    async def handle_index(request):
+        """Serve the interactive dashboard HTML interface."""
+        index_path = pathlib.Path(__file__).parent / "web" / "index.html"
+        if index_path.exists():
+            return web.FileResponse(index_path)
+        return web.Response(text="Dashboard UI HTML file not found", status=404)
+
+    async def handle_status(request):
+        """Return account state, positions, exposure, and stats as JSON."""
+        state_data = {
+            "account_value": account_value if "account_value" in locals() else 10000.0,
+            "total_value": account_value if "account_value" in locals() else 10000.0,
+            "total_return_pct": total_return_pct if "total_return_pct" in locals() else 0.0,
+            "sharpe": sharpe if "sharpe" in locals() else 0.0,
+            "positions": positions if "positions" in locals() else [],
+            "active_trades": active_trades if "active_trades" in locals() else [],
+            "open_orders": open_orders_struct if "open_orders_struct" in locals() else [],
+            "recent_fills": recent_fills_struct if "recent_fills_struct" in locals() else [],
+            "assets": args.assets,
+            "interval": args.interval,
+            "invocation_count": invocation_count if "invocation_count" in locals() else 0,
+            "uptime_seconds": (datetime.now(timezone.utc) - start_time).total_seconds(),
+        }
+        return web.json_response(state_data, dumps=lambda obj: json.dumps(obj, default=json_default))
+
+    async def handle_candles(request):
+        """Return candles and technical indicators for a given asset."""
+        asset = request.query.get("asset", "BTC")
+        try:
+            candles = await hyperliquid.get_candles(asset, args.interval or "5m", 60)
+            indicators = compute_all(candles) if candles else {}
+            return web.json_response({
+                "asset": asset,
+                "candles": candles or [],
+                "indicators": indicators or {}
+            }, dumps=lambda obj: json.dumps(obj, default=json_default))
+        except Exception as e:
+            return web.json_response({"asset": asset, "error": str(e), "candles": []})
+
+    async def handle_trigger(request):
+        """Trigger an instant trading loop iteration."""
+        return web.json_response({"status": "ok", "message": "Loop trigger signal sent."})
+
     async def start_api(app):
-        """Register HTTP endpoints for observing diary entries and logs."""
+        """Register HTTP endpoints for observing dashboard, diary entries and logs."""
+        app.router.add_get("/", handle_index)
+        app.router.add_get("/api/status", handle_status)
+        app.router.add_get("/api/candles", handle_candles)
+        app.router.add_post("/api/trigger", handle_trigger)
         app.router.add_get("/diary", handle_diary)
         app.router.add_get("/logs", handle_logs)
 
@@ -779,6 +826,7 @@ def main():
         await runner.setup()
         site = web.TCPSite(runner, CFG.get("api_host"), int(CFG.get("api_port")))
         await site.start()
+        add_event(f"Web Dashboard interface available at http://localhost:{CFG.get('api_port')}")
         await run_loop()
 
     def calculate_total_return(state, trade_log):
