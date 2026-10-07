@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LearnChart AI Trading Agent | Real-Time Hyperliquid Terminal</title>
+    <title>LearnChart AI Trading Agent | Hyperliquid Terminal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- TradingView Lightweight Charts Library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
-            /* Ultra Attractive Violet & Cyber Slate Color Palette */
-            --bg-dark: #07080E;
-            --bg-card: rgba(15, 23, 42, 0.82);
-            --bg-card-hover: rgba(30, 41, 59, 0.9);
-            --bg-search: rgba(30, 41, 59, 0.6);
+            /* Premium Dark Cyber Palette */
+            --bg-dark: #06070B;
+            --bg-card: rgba(13, 19, 36, 0.85);
+            --bg-card-hover: rgba(23, 32, 54, 0.92);
+            --bg-search: rgba(23, 32, 54, 0.7);
             --border-color: rgba(255, 255, 255, 0.09);
-            --border-highlight: rgba(124, 58, 237, 0.4);
+            --border-highlight: rgba(124, 58, 237, 0.5);
             
             --text-primary: #F8FAFC;
             --text-secondary: #94A3B8;
@@ -71,7 +75,7 @@
         }
 
         .glass-panel:hover {
-            border-color: rgba(124, 58, 237, 0.3);
+            border-color: rgba(124, 58, 237, 0.35);
         }
 
         /* Header Navigation */
@@ -81,7 +85,7 @@
             align-items: center;
             padding: 14px 32px;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(7, 8, 14, 0.92);
+            background: rgba(6, 7, 11, 0.94);
             backdrop-filter: blur(24px);
             position: sticky;
             top: 0;
@@ -123,10 +127,10 @@
             font-weight: 500;
         }
 
-        /* Search Container in Header */
+        /* Search Container */
         .header-search-container {
             position: relative;
-            width: 380px;
+            width: 320px;
         }
 
         .search-input-wrap {
@@ -137,13 +141,11 @@
             border-radius: 12px;
             padding: 8px 16px;
             gap: 10px;
-            transition: all 0.2s ease;
         }
 
         .search-input-wrap:focus-within {
             border-color: var(--accent-violet);
             box-shadow: 0 0 16px rgba(124, 58, 237, 0.35);
-            background: rgba(30, 41, 59, 0.9);
         }
 
         .search-input {
@@ -151,36 +153,26 @@
             border: none;
             outline: none;
             color: #ffffff;
-            font-family: var(--font-sans);
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 500;
             width: 100%;
         }
 
-        .search-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        /* Autocomplete Dropdown List */
         .search-dropdown {
             position: absolute;
             top: calc(100% + 8px);
             left: 0;
             width: 100%;
-            max-height: 320px;
+            max-height: 300px;
             overflow-y: auto;
-            background: rgba(15, 23, 42, 0.96);
+            background: rgba(13, 19, 36, 0.96);
             border: 1px solid var(--border-highlight);
             border-radius: 12px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
             z-index: 300;
             display: none;
         }
 
-        .search-dropdown.active {
-            display: block;
-        }
+        .search-dropdown.active { display: block; }
 
         .dropdown-item {
             display: flex;
@@ -189,78 +181,24 @@
             padding: 10px 16px;
             cursor: pointer;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            transition: background 0.15s ease;
         }
 
-        .dropdown-item:hover {
-            background: rgba(124, 58, 237, 0.2);
-        }
-
-        .dropdown-symbol {
-            font-weight: 700;
-            font-size: 14px;
-            color: #ffffff;
-        }
-
-        .dropdown-price {
-            font-family: var(--font-mono);
-            font-size: 13px;
-            color: var(--accent-cyan);
-            font-weight: 600;
-        }
+        .dropdown-item:hover { background: rgba(124, 58, 237, 0.2); }
 
         .status-strip {
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            border: 1px solid transparent;
-        }
-
-        .badge-live {
-            background: var(--green-bg);
-            color: var(--green-light);
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .badge-info {
-            background: rgba(124, 58, 237, 0.15);
-            color: #C4B5FD;
-            border-color: rgba(124, 58, 237, 0.3);
-        }
-
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--green-glow);
-            box-shadow: 0 0 10px var(--green-glow);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            gap: 14px;
         }
 
         .btn {
             background: linear-gradient(135deg, var(--accent-violet), var(--accent-indigo));
             color: #ffffff;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: 10px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13.5px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -274,6 +212,11 @@
             box-shadow: 0 6px 24px rgba(124, 58, 237, 0.55);
         }
 
+        .btn-green {
+            background: linear-gradient(135deg, #10B981, #059669);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+        }
+
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
@@ -281,14 +224,9 @@
             box-shadow: none;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
         /* Container Layout */
         .container {
-            max-width: 1650px;
+            max-width: 1680px;
             margin: 0 auto;
             padding: 24px 32px;
             display: flex;
@@ -299,7 +237,7 @@
         /* Metric Summary Grid */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 16px;
         }
 
@@ -320,7 +258,6 @@
             width: 4px;
             height: 100%;
             background: var(--accent-violet);
-            border-radius: 4px 0 0 4px;
         }
 
         .metric-card.green::before { background: var(--green-glow); }
@@ -336,7 +273,7 @@
         }
 
         .metric-value {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 800;
             font-family: var(--font-mono);
             letter-spacing: -1px;
@@ -353,11 +290,6 @@
             font-weight: 600;
         }
 
-        .txt-green { color: var(--green-light); }
-        .txt-red { color: var(--red-light); }
-        .txt-amber { color: var(--amber-glow); }
-        .txt-cyan { color: var(--accent-cyan); }
-
         /* Active Asset Banner Bar */
         .asset-banner {
             padding: 18px 24px;
@@ -366,14 +298,8 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(6, 182, 212, 0.08));
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.14), rgba(6, 182, 212, 0.08));
             border: 1px solid var(--border-highlight);
-        }
-
-        .asset-info-group {
-            display: flex;
-            align-items: center;
-            gap: 18px;
         }
 
         .asset-symbol-title {
@@ -390,124 +316,87 @@
             font-size: 26px;
             font-weight: 800;
             color: var(--accent-cyan);
+            transition: color 0.3s ease;
         }
 
-        .stat-pill {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
+        .asset-live-price.flash-up { color: var(--green-light); }
+        .asset-live-price.flash-down { color: var(--red-light); }
 
-        .stat-pill-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .stat-pill-val {
-            font-family: var(--font-mono);
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        /* Main Dashboard Split */
-        .dashboard-split {
-            display: grid;
-            grid-template-columns: 2.2fr 1fr;
-            gap: 24px;
-        }
-
-        @media (max-width: 1280px) {
-            .dashboard-split {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Technical Chart Panel */
-        .chart-module {
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .chart-header {
+        /* Chart Toolbar Controls */
+        .chart-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .interval-tab-bar {
+        .chart-type-selector, .indicator-toggle-group {
             display: flex;
             gap: 6px;
-            background: rgba(0, 0, 0, 0.25);
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            align-items: center;
         }
 
-        .interval-tab {
-            padding: 6px 14px;
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
             border-radius: 8px;
             font-size: 12px;
-            font-weight: 700;
-            color: var(--text-secondary);
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
         }
 
-        .interval-tab.active, .interval-tab:hover {
+        .tool-btn.active, .tool-btn:hover {
             background: var(--accent-violet);
             color: #ffffff;
+            border-color: var(--accent-violet);
         }
 
-        .chart-container {
+        /* TradingView Chart Wrapper */
+        .chart-container-wrap {
             position: relative;
-            height: 400px;
+            height: 420px;
             width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #090B12;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Market Watchlist & Instant Selector */
+        #tv-chart-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Dashboard Split Layout */
+        .dashboard-split {
+            display: grid;
+            grid-template-columns: 2.3fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1280px) {
+            .dashboard-split { grid-template-columns: 1fr; }
+        }
+
+        /* Watchlist */
         .watchlist-module {
             padding: 24px;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            max-height: 520px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .watchlist-search-box {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 8px 14px;
-            color: #ffffff;
-            font-family: var(--font-sans);
-            font-size: 13px;
-            outline: none;
-        }
-
-        .watchlist-search-box:focus {
-            border-color: var(--accent-violet);
+            max-height: 560px;
         }
 
         .table-responsive {
             overflow-x: auto;
             overflow-y: auto;
-            max-height: 380px;
+            max-height: 420px;
             width: 100%;
         }
 
@@ -524,35 +413,22 @@
             font-weight: 600;
             text-transform: uppercase;
             font-size: 11px;
-            letter-spacing: 0.8px;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(13, 19, 36, 0.95);
         }
 
         td {
             padding: 12px 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            font-family: var(--font-sans);
         }
 
-        tr {
-            cursor: pointer;
-            transition: background 0.15s ease;
-        }
+        tr { cursor: pointer; transition: background 0.15s ease; }
+        tr:hover td { background: var(--bg-card-hover); }
+        tr.active-row td { background: rgba(124, 58, 237, 0.2); }
 
-        tr:hover td {
-            background: var(--bg-card-hover);
-        }
-
-        tr.active-row td {
-            background: rgba(124, 58, 237, 0.18);
-        }
-
-        .mono {
-            font-family: var(--font-mono);
-        }
+        .mono { font-family: var(--font-mono); }
 
         .signal-pill {
             padding: 4px 10px;
@@ -560,125 +436,137 @@
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
-            display: inline-block;
-            letter-spacing: 0.5px;
         }
 
         .signal-buy { background: var(--green-bg); color: var(--green-light); border: 1px solid rgba(16, 185, 129, 0.3); }
         .signal-sell { background: var(--red-bg); color: var(--red-light); border: 1px solid rgba(244, 63, 94, 0.3); }
         .signal-hold { background: rgba(148, 163, 184, 0.15); color: var(--text-secondary); border: 1px solid var(--border-color); }
 
-        /* Split Section Grid */
-        .section-grid {
-            display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            gap: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .section-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* AI Diary Feed */
-        .diary-module {
-            padding: 24px;
+        /* Floating AI Chatbot Box */
+        .ai-chatbot-drawer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 380px;
+            height: 520px;
+            background: rgba(13, 19, 36, 0.96);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-highlight);
+            border-radius: 18px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-height: 480px;
-            overflow-y: auto;
+            z-index: 500;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .diary-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: all 0.2s ease;
+        .ai-chatbot-drawer.minimized {
+            height: 54px;
         }
 
-        .diary-card:hover {
-            border-color: var(--border-highlight);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .diary-meta {
+        .chat-header {
+            padding: 14px 18px;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-indigo));
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .diary-rationale {
-            font-size: 13.5px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        /* Safety Guards Matrix */
-        .guards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 12px;
-        }
-
-        .guard-item {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-color);
-            padding: 14px 16px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .guard-name {
-            font-size: 12.5px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .guard-val {
-            font-family: var(--font-mono);
-            font-size: 13px;
+            color: #ffffff;
             font-weight: 700;
-            color: var(--accent-cyan);
+            font-size: 14.5px;
+            cursor: pointer;
         }
 
-        /* Log Terminal Console */
-        .log-console {
-            background: #040509;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+        .chat-body {
+            flex: 1;
             padding: 16px;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: #38BDF8;
-            max-height: 220px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .chat-msg {
+            padding: 12px 14px;
+            border-radius: 12px;
+            line-height: 1.5;
+            max-width: 90%;
             white-space: pre-wrap;
-            word-break: break-all;
-            line-height: 1.6;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #ffffff;
-            animation: spin 0.8s linear infinite;
+        .chat-msg.user {
+            background: var(--accent-violet);
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .chat-msg.bot {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-prompt-chips {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .chip {
+            padding: 4px 10px;
+            border-radius: 14px;
+            background: rgba(124, 58, 237, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            color: var(--text-primary);
+            font-size: 11.5px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .chat-input-row {
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: #ffffff;
+            outline: none;
+            font-family: var(--font-sans);
+            font-size: 13px;
+        }
+
+        /* Deposit Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            width: 90%; max-width: 480px;
+            padding: 28px;
+            display: flex; flex-direction: column; gap: 20px;
         }
     </style>
 </head>
@@ -690,31 +578,28 @@
             <div class="brand-icon">LC</div>
             <div class="brand-title">
                 <h1>LearnChart AI Terminal</h1>
-                <p>Hyperliquid Real-Time Perpetuals & HIP-3 Engine</p>
+                <p>Hyperliquid Real-Time Perpetuals Engine</p>
             </div>
         </div>
 
-        <!-- Global Market Search Bar -->
+        <!-- Global Search -->
         <div class="header-search-container">
             <div class="search-input-wrap">
                 <svg width="18" height="18" fill="none" stroke="var(--text-muted)" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" id="global-search" class="search-input" placeholder="Search crypto (e.g. BTC, ETH, SOL, HYPE, xyz:GOLD)..." autocomplete="off">
+                <input type="text" id="global-search" class="search-input" placeholder="Search crypto (BTC, ETH, SOL, HYPE)..." autocomplete="off">
             </div>
             <div id="search-dropdown" class="search-dropdown"></div>
         </div>
 
         <div class="status-strip">
-            <div class="badge badge-live">
-                <span class="pulse-dot"></span>
-                <span id="system-status">LIVE HYPERLIQUID</span>
-            </div>
-            <div class="badge badge-info" id="network-badge">MAINNET 1200+ MARKETS</div>
-            <button class="btn" id="btn-trigger-loop" onclick="triggerTradingLoop()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Run AI Loop
+            <button class="btn btn-green" onclick="openDepositModal()">
+                💰 Deposit Funds
             </button>
-            <button class="btn btn-secondary" onclick="fetchState()">
-                ↻ Refresh
+            <button class="btn btn-secondary" onclick="openWithdrawModal()">
+                💸 Withdraw
+            </button>
+            <button class="btn" id="btn-trigger-loop" onclick="triggerTradingLoop()">
+                ⚡ Run AI Loop
             </button>
         </div>
     </header>
@@ -726,20 +611,22 @@
         <div class="metrics-grid">
             <div class="glass-panel metric-card green">
                 <div class="metric-header">
-                    <span class="metric-label">Account Value</span>
+                    <span class="metric-label">Total Portfolio Equity</span>
                     <svg width="20" height="20" fill="none" stroke="var(--green-light)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div class="metric-value" id="val-account-value">$10,542.80</div>
-                <div class="metric-sub txt-green" id="val-return-pct">+5.43% Total Return</div>
+                <div class="metric-sub txt-green" id="val-cash-balance">Available Cash: $10,000.00 USDC</div>
             </div>
 
             <div class="glass-panel metric-card cyan">
                 <div class="metric-header">
-                    <span class="metric-label">Active Exposure</span>
-                    <svg width="20" height="20" fill="none" stroke="var(--accent-cyan)" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    <span class="metric-label">AI Agent Auto-Pilot</span>
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="toggle-agent-checkbox" checked onchange="toggleAgentAutoPilot(this.checked)" style="width: 18px; height: 18px; accent-color: var(--accent-violet);">
+                    </label>
                 </div>
-                <div class="metric-value" id="val-active-positions">1 Position</div>
-                <div class="metric-sub txt-cyan" id="val-exposure-pct">19.5% / 50% Max Cap</div>
+                <div class="metric-value" id="val-agent-status" style="font-size: 24px; color: var(--green-light);">AUTO-TRADING ACTIVE</div>
+                <div class="metric-sub txt-cyan">Claude AI signs & executes on behalf of user</div>
             </div>
 
             <div class="glass-panel metric-card amber">
@@ -753,102 +640,100 @@
 
             <div class="glass-panel metric-card">
                 <div class="metric-header">
-                    <span class="metric-label">Code Safety Guards</span>
+                    <span class="metric-label">Safety Guards</span>
                     <svg width="20" height="20" fill="none" stroke="var(--accent-violet)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 </div>
-                <div class="metric-value txt-green">100% PROTECTED</div>
-                <div class="metric-sub" style="color: var(--text-muted)">8 Risk Rules Enforced</div>
+                <div class="metric-value txt-green" style="font-size: 24px;">100% PROTECTED</div>
+                <div class="metric-sub" style="color: var(--text-muted)">8 Hardcoded Risk Guards Active</div>
             </div>
         </div>
 
-        <!-- Selected Asset Active Stats Banner -->
+        <!-- Selected Asset Active Banner -->
         <div class="glass-panel asset-banner" id="active-asset-banner">
-            <div class="asset-info-group">
+            <div style="display: flex; align-items: center; gap: 18px;">
                 <div class="asset-symbol-title">
                     <span id="banner-symbol">BTC/USD</span>
                     <span class="signal-pill signal-buy" id="banner-signal-pill">BUY</span>
                 </div>
-                <div class="asset-live-price" id="banner-price">$83,328.50</div>
+                <div class="asset-live-price" id="banner-price">$83,448.50</div>
             </div>
             
             <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
-                <div class="stat-pill">
-                    <span class="stat-pill-label">24h High</span>
-                    <span class="stat-pill-val" id="banner-high">$84,120.00</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">24h High</span>
+                    <span id="banner-high" style="font-family: var(--font-mono); font-weight: 700;">$84,120.00</span>
                 </div>
-                <div class="stat-pill">
-                    <span class="stat-pill-label">24h Low</span>
-                    <span class="stat-pill-val" id="banner-low">$82,450.00</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">24h Low</span>
+                    <span id="banner-low" style="font-family: var(--font-mono); font-weight: 700;">$82,450.00</span>
                 </div>
-                <div class="stat-pill">
-                    <span class="stat-pill-label">Live RSI (14)</span>
-                    <span class="stat-pill-val" id="banner-rsi">42.1</span>
-                </div>
-                <div class="stat-pill">
-                    <span class="stat-pill-label">AI Rationale</span>
-                    <span class="stat-pill-val" id="banner-rationale" style="max-width: 320px; font-family: var(--font-sans); font-size: 12px; color: var(--text-secondary);">RSI neutral. Holding near EMA20 support.</span>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Live RSI (14)</span>
+                    <span id="banner-rsi" style="font-family: var(--font-mono); font-weight: 700;">42.1</span>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Split: Technical Chart & Market Watchlist -->
+        <!-- Dashboard Split: TradingView Chart & Watchlist -->
         <div class="dashboard-split">
             
-            <!-- Real-Time Technical Chart -->
-            <div class="glass-panel chart-module">
-                <div class="chart-header">
-                    <div class="section-title">
-                        Real-Time Market Chart & Technical Indicators
-                        <span style="font-size: 12px; color: var(--text-muted); font-weight: normal; margin-left: 8px;">EMA(20, 50) • RSI • VWAP</span>
+            <!-- Real-Time TradingView Technical Chart Module -->
+            <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+                <div class="chart-toolbar">
+                    <div class="chart-type-selector">
+                        <button class="tool-btn active" id="btn-type-candle" onclick="setChartType('candle')">📊 Candlesticks</button>
+                        <button class="tool-btn" id="btn-type-line" onclick="setChartType('line')">📈 Line Chart</button>
                     </div>
-                    
-                    <div class="interval-tab-bar">
-                        <div class="interval-tab" onclick="setIntervalPeriod('1m')">1m</div>
-                        <div class="interval-tab active" onclick="setIntervalPeriod('5m')">5m</div>
-                        <div class="interval-tab" onclick="setIntervalPeriod('15m')">15m</div>
-                        <div class="interval-tab" onclick="setIntervalPeriod('1h')">1h</div>
-                        <div class="interval-tab" onclick="setIntervalPeriod('4h')">4h</div>
+
+                    <div class="indicator-toggle-group">
+                        <button class="tool-btn active" id="btn-ind-ema20" onclick="toggleIndicator('ema20')">EMA 20</button>
+                        <button class="tool-btn active" id="btn-ind-ema50" onclick="toggleIndicator('ema50')">EMA 50</button>
+                    </div>
+
+                    <div style="display: flex; gap: 6px;">
+                        <button class="tool-btn" onclick="setIntervalPeriod('1m')">1m</button>
+                        <button class="tool-btn active" onclick="setIntervalPeriod('5m')">5m</button>
+                        <button class="tool-btn" onclick="setIntervalPeriod('15m')">15m</button>
+                        <button class="tool-btn" onclick="setIntervalPeriod('1h')">1h</button>
                     </div>
                 </div>
 
-                <div class="chart-container">
-                    <canvas id="marketChart"></canvas>
+                <div class="chart-container-wrap">
+                    <div id="tv-chart-container"></div>
                 </div>
             </div>
 
-            <!-- Market Watchlist & Quick Search -->
+            <!-- Market Watchlist -->
             <div class="glass-panel watchlist-module">
-                <div class="section-title">
-                    <span>Live Crypto Markets</span>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 700; font-size: 16px;">Live Markets</span>
                     <span class="badge badge-info" id="market-count-badge">Loading...</span>
                 </div>
                 
-                <input type="text" class="watchlist-search-box" id="watchlist-filter" placeholder="Filter watchlist symbol..." oninput="filterWatchlistTable()">
+                <input type="text" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 14px; color: #fff; outline: none;" id="watchlist-filter" placeholder="Filter coin symbol..." oninput="filterWatchlistTable()">
 
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>Symbol</th>
-                                <th>Live Price</th>
-                                <th>AI Signal</th>
+                                <th>Price</th>
+                                <th>Signal</th>
                             </tr>
                         </thead>
                         <tbody id="watchlist-tbody">
-                            <tr><td colspan="3" style="text-align:center; padding:20px; color: var(--text-muted);">Fetching live market list...</td></tr>
+                            <tr><td colspan="3" style="text-align:center; padding:20px;">Loading live prices...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Section Grid: Active Positions & Safety Rules -->
-        <div class="section-grid">
-            
-            <!-- Active Positions & Pending Orders -->
+        <!-- Section Grid: Active Positions & Safety Guards -->
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px;">
             <div class="glass-panel" style="padding: 24px;">
-                <div class="section-title" style="margin-bottom: 16px;">
-                    Active Positions & Open Orders
+                <div style="font-weight: 700; font-size: 16px; margin-bottom: 16px;">
+                    Active Positions & Agent Delegated Trades
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -870,223 +755,199 @@
                 </div>
             </div>
 
-            <!-- Code Safety Guards Matrix -->
+            <!-- Hardcoded Safety Guards Matrix -->
             <div class="glass-panel" style="padding: 24px;">
-                <div class="section-title" style="margin-bottom: 16px;">
-                    Code-Level Safety Guards Matrix
+                <div style="font-weight: 700; font-size: 16px; margin-bottom: 16px;">
+                    Hardcoded Risk & Protection Rules
                 </div>
-                <div class="guards-grid">
-                    <div class="guard-item">
-                        <span class="guard-name">Max Position Size</span>
-                        <span class="guard-val">20% Portfolio</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between;">
+                        <span style="font-size: 12px; color: var(--text-secondary);">Max Position</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">20% Portfolio</span>
                     </div>
-                    <div class="guard-item">
-                        <span class="guard-name">Force-Close Loss</span>
-                        <span class="guard-val">-20% PnL</span>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between;">
+                        <span style="font-size: 12px; color: var(--text-secondary);">Force Close</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--red-light);">-20% PnL</span>
                     </div>
-                    <div class="guard-item">
-                        <span class="guard-name">Max Leverage Cap</span>
-                        <span class="guard-val">10x Hard Cap</span>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between;">
+                        <span style="font-size: 12px; color: var(--text-secondary);">Max Leverage</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--amber-glow);">10x Hard Cap</span>
                     </div>
-                    <div class="guard-item">
-                        <span class="guard-name">Total Exposure Limit</span>
-                        <span class="guard-val">80% Portfolio</span>
-                    </div>
-                    <div class="guard-item">
-                        <span class="guard-name">Daily Circuit Breaker</span>
-                        <span class="guard-val">-25% Drawdown</span>
-                    </div>
-                    <div class="guard-item">
-                        <span class="guard-name">Mandatory Stop Loss</span>
-                        <span class="guard-val">5% Automatic</span>
-                    </div>
-                    <div class="guard-item">
-                        <span class="guard-name">Max Concurrent Trades</span>
-                        <span class="guard-val">10 Positions</span>
-                    </div>
-                    <div class="guard-item">
-                        <span class="guard-name">Balance Reserve Cap</span>
-                        <span class="guard-val">10% Min Cash</span>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between;">
+                        <span style="font-size: 12px; color: var(--text-secondary);">Mandatory SL</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--green-light);">5% Automatic</span>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Section Grid: AI Decision Feed & Terminal Logs -->
-        <div class="section-grid">
-            
-            <!-- AI Trade Diary Stream -->
-            <div class="glass-panel diary-module">
-                <div class="section-title">
-                    Claude AI Decision Stream & Diary
-                </div>
-                <div id="diary-feed" style="display: flex; flex-direction: column; gap: 12px;">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-
-            <!-- Live Log Terminal -->
-            <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
-                <div class="section-title">
-                    System & LLM Request Terminal
-                    <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="fetchLogs()">Refresh Logs</button>
-                </div>
-                <div class="log-console" id="log-terminal">Initializing LearnChart Trading Terminal...</div>
-            </div>
-
         </div>
 
     </div>
 
-    <!-- Interactive Script Logic -->
+    <!-- AI Signal Predictor Chatbot Drawer -->
+    <div class="ai-chatbot-drawer" id="chatbot-drawer">
+        <div class="chat-header" onclick="toggleChatDrawer()">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>🤖 LearnChart AI Signal Predictor</span>
+            </div>
+            <span id="chat-toggle-icon">▼</span>
+        </div>
+        
+        <div class="chat-body" id="chat-box">
+            <div class="chat-msg bot">
+ 👋 Hello! I am your **LearnChart AI Signal Engine**. 
+Ask me to analyze any crypto asset, predict price trends, or calculate technical indicators!
+            </div>
+        </div>
+
+        <div class="chat-prompt-chips">
+            <span class="chip" onclick="quickAsk('Analyze BTC trend and give TP/SL')">🔍 Analyze BTC</span>
+            <span class="chip" onclick="quickAsk('Predict ETH price movement for 1h')">📈 Predict ETH</span>
+            <span class="chip" onclick="quickAsk('Is SOL bullish right now?')">⚡ Is SOL Bullish?</span>
+        </div>
+
+        <div class="chat-input-row">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Ask AI for signal prediction..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button class="btn" style="padding: 8px 14px;" onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Deposit USDC Modal -->
+    <div class="modal-overlay" id="deposit-modal">
+        <div class="glass-panel modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 18px; font-weight: 700;">💰 Deposit USDC Funds</h3>
+                <span style="cursor: pointer; font-size: 20px;" onclick="closeModal('deposit-modal')">✕</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary);">Deposit USDC directly to your LearnChart trading wallet to enable automated agent execution.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 14px; border-radius: 12px; font-family: var(--font-mono); font-size: 12px; word-break: break-all; color: var(--accent-cyan);">
+                Deposit Address (Arb / Hyperliquid):<br>
+                <strong id="deposit-address-text">0x71C8b4F2D9914A3E940026e149B9057b54aA2B7e</strong>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Amount to Deposit (USDC)</label>
+                <input type="number" id="deposit-amount-input" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; color: #fff; font-family: var(--font-mono); outline: none;" placeholder="500">
+            </div>
+
+            <button class="btn btn-green" onclick="submitDeposit()">Confirm USDC Deposit</button>
+        </div>
+    </div>
+
+    <!-- Withdraw USDC Modal -->
+    <div class="modal-overlay" id="withdraw-modal">
+        <div class="glass-panel modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 18px; font-weight: 700;">💸 Withdraw USDC Funds</h3>
+                <span style="cursor: pointer; font-size: 20px;" onclick="closeModal('withdraw-modal')">✕</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary);">Withdraw available cash balance to your external Web3 wallet.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Withdrawal Amount (USDC)</label>
+                <input type="number" id="withdraw-amount-input" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; color: #fff; font-family: var(--font-mono); outline: none;" placeholder="100">
+            </div>
+
+            <button class="btn" onclick="submitWithdraw()">Withdraw to Wallet</button>
+        </div>
+    </div>
+
+    <!-- TradingView Lightweight Charts & Interactivity Scripts -->
     <script>
         let currentAsset = 'BTC';
         let currentInterval = '5m';
-        let chartInstance = null;
+        let chartType = 'candle'; // 'candle' or 'line'
+        let tvChart = null;
+        let mainSeries = null;
+        let ema20Series = null;
+        let ema50Series = null;
+        let showEma20 = true;
+        let showEma50 = true;
         let allMarkets = [];
+        let previousPrice = null;
 
-        // Global Market Search with Autocomplete
-        const searchInput = document.getElementById('global-search');
-        const searchDropdown = document.getElementById('search-dropdown');
+        // Initialize TradingView Lightweight Chart
+        function initTradingViewChart() {
+            const container = document.getElementById('tv-chart-container');
+            container.innerHTML = '';
 
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim().toUpperCase();
-            if (!query) {
-                searchDropdown.classList.remove('active');
-                return;
-            }
-            const matches = allMarkets.filter(m => m.symbol.toUpperCase().includes(query)).slice(0, 10);
-            if (matches.length === 0) {
-                searchDropdown.innerHTML = `<div class="dropdown-item" style="color: var(--text-muted);">No coin symbol matching "${query}"</div>`;
-            } else {
-                searchDropdown.innerHTML = matches.map(m => `
-                    <div class="dropdown-item" onclick="selectSymbol('${m.symbol}')">
-                        <span class="dropdown-symbol">${m.symbol}</span>
-                        <span class="dropdown-price">$${formatNumber(m.price)}</span>
-                    </div>
-                `).join('');
-            }
-            searchDropdown.classList.add('active');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.header-search-container')) {
-                searchDropdown.classList.remove('active');
-            }
-        });
-
-        function selectSymbol(symbol) {
-            currentAsset = symbol;
-            searchInput.value = symbol;
-            searchDropdown.classList.remove('active');
-            fetchCandles(currentAsset, currentInterval);
-            highlightWatchlistRow(symbol);
-        }
-
-        function setIntervalPeriod(period) {
-            currentInterval = period;
-            document.querySelectorAll('.interval-tab').forEach(t => {
-                t.classList.toggle('active', t.innerText === period);
-            });
-            fetchCandles(currentAsset, currentInterval);
-        }
-
-        async function fetchMarketsList() {
-            try {
-                const res = await fetch('/api/markets');
-                if (res.ok) {
-                    const data = await res.json();
-                    allMarkets = data.markets || [];
-                    document.getElementById('market-count-badge').innerText = `${allMarkets.length} Coins Live`;
-                    renderWatchlistTable(allMarkets);
-                }
-            } catch (err) {
-                console.log('Error fetching markets list:', err);
-            }
-        }
-
-        function renderWatchlistTable(markets) {
-            const tbody = document.getElementById('watchlist-tbody');
-            const displayList = markets.slice(0, 40); // Top 40
-            tbody.innerHTML = displayList.map(m => `
-                <tr class="${m.symbol === currentAsset ? 'active-row' : ''}" onclick="selectSymbol('${m.symbol}')">
-                    <td style="font-weight: 700; color: #ffffff;">${m.symbol}</td>
-                    <td class="mono" style="color: var(--accent-cyan);">$${formatNumber(m.price)}</td>
-                    <td><span class="signal-pill signal-hold">WATCH</span></td>
-                </tr>
-            `).join('');
-        }
-
-        function filterWatchlistTable() {
-            const q = document.getElementById('watchlist-filter').value.trim().toUpperCase();
-            const filtered = allMarkets.filter(m => m.symbol.toUpperCase().includes(q));
-            renderWatchlistTable(filtered);
-        }
-
-        function highlightWatchlistRow(symbol) {
-            document.querySelectorAll('#watchlist-tbody tr').forEach(row => {
-                const cellSymbol = row.cells[0]?.innerText;
-                row.classList.toggle('active-row', cellSymbol === symbol);
-            });
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('marketChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: `${currentAsset} Live Price`,
-                            data: [],
-                            borderColor: '#7C3AED',
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0.2
-                        },
-                        {
-                            label: 'EMA (20)',
-                            data: [],
-                            borderColor: '#10B981',
-                            borderWidth: 1.5,
-                            borderDash: [4, 4],
-                            fill: false
-                        },
-                        {
-                            label: 'EMA (50)',
-                            data: [],
-                            borderColor: '#F59E0B',
-                            borderWidth: 1.5,
-                            borderDash: [2, 2],
-                            fill: false
-                        }
-                    ]
+            tvChart = LightweightCharts.createChart(container, {
+                layout: {
+                    backgroundColor: '#090B12',
+                    textColor: '#94A3B8',
+                    fontFamily: 'Outfit, sans-serif'
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#94A3B8', font: { family: 'Outfit' } }
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                            ticks: { color: '#64748B' }
-                        },
-                        y: {
-                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                            ticks: { color: '#64748B' }
-                        }
-                    }
-                }
+                grid: {
+                    vertLines: { color: 'rgba(255, 255, 255, 0.04)' },
+                    horzLines: { color: 'rgba(255, 255, 255, 0.04)' }
+                },
+                crosshair: {
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                },
+                rightPriceScale: {
+                    borderColor: 'rgba(255, 255, 255, 0.08)',
+                },
+                timeScale: {
+                    borderColor: 'rgba(255, 255, 255, 0.08)',
+                    timeVisible: true,
+                    secondsVisible: false,
+                },
             });
+
+            createSeries();
+        }
+
+        function createSeries() {
+            if (!tvChart) return;
+
+            if (chartType === 'candle') {
+                mainSeries = tvChart.addCandlestickSeries({
+                    upColor: '#10B981',
+                    downColor: '#F43F5E',
+                    borderVisible: false,
+                    wickUpColor: '#10B981',
+                    wickDownColor: '#F43F5E',
+                });
+            } else {
+                mainSeries = tvChart.addLineSeries({
+                    color: '#7C3AED',
+                    lineWidth: 3,
+                });
+            }
+
+            ema20Series = tvChart.addLineSeries({
+                color: '#10B981',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
+                visible: showEma20,
+            });
+
+            ema50Series = tvChart.addLineSeries({
+                color: '#F59E0B',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                visible: showEma50,
+            });
+        }
+
+        function setChartType(type) {
+            chartType = type;
+            document.getElementById('btn-type-candle').classList.toggle('active', type === 'candle');
+            document.getElementById('btn-type-line').classList.toggle('active', type === 'line');
+            initTradingViewChart();
+            fetchCandles(currentAsset, currentInterval);
+        }
+
+        function toggleIndicator(ind) {
+            if (ind === 'ema20') {
+                showEma20 = !showEma20;
+                document.getElementById('btn-ind-ema20').classList.toggle('active', showEma20);
+                if (ema20Series) ema20Series.applyOptions({ visible: showEma20 });
+            } else if (ind === 'ema50') {
+                showEma50 = !showEma50;
+                document.getElementById('btn-ind-ema50').classList.toggle('active', showEma50);
+                if (ema50Series) ema50Series.applyOptions({ visible: showEma50 });
+            }
         }
 
         async function fetchCandles(asset, interval) {
@@ -1094,44 +955,56 @@
                 const res = await fetch(`/api/candles?asset=${asset}&interval=${interval}`);
                 if (res.ok) {
                     const data = await res.json();
-                    if (data.candles && data.candles.length > 0 && chartInstance) {
-                        const closes = data.candles.map(c => c.c);
-                        const labels = data.candles.map(c => new Date(c.t).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+                    if (data.candles && data.candles.length > 0 && mainSeries) {
+                        const formattedCandles = data.candles.map(c => ({
+                            time: Math.floor(c.t / 1000),
+                            open: c.o,
+                            high: c.h,
+                            low: c.l,
+                            close: c.c,
+                            value: c.c
+                        }));
+
+                        mainSeries.setData(formattedCandles);
+
+                        if (data.indicators && data.indicators.ema20 && ema20Series) {
+                            const ema20Data = data.candles.map((c, i) => ({
+                                time: Math.floor(c.t / 1000),
+                                value: data.indicators.ema20[i] || c.c
+                            }));
+                            ema20Series.setData(ema20Data);
+                        }
+
+                        if (data.indicators && data.indicators.ema50 && ema50Series) {
+                            const ema50Data = data.candles.map((c, i) => ({
+                                time: Math.floor(c.t / 1000),
+                                value: data.indicators.ema50[i] || c.c
+                            }));
+                            ema50Series.setData(ema50Data);
+                        }
+
+                        // Banner Stats
+                        const lastPx = data.current_price || formattedCandles[formattedCandles.length - 1].close;
+                        const bannerPx = document.getElementById('banner-price');
                         
-                        chartInstance.data.labels = labels;
-                        chartInstance.data.datasets[0].label = `${asset} Price ($)`;
-                        chartInstance.data.datasets[0].data = closes;
-
-                        if (data.indicators && data.indicators.ema20) {
-                            chartInstance.data.datasets[1].data = data.indicators.ema20;
+                        if (previousPrice !== null) {
+                            bannerPx.className = `asset-live-price ${lastPx >= previousPrice ? 'flash-up' : 'flash-down'}`;
                         }
-                        if (data.indicators && data.indicators.ema50) {
-                            chartInstance.data.datasets[2].data = data.indicators.ema50;
-                        }
-                        chartInstance.update();
+                        previousPrice = lastPx;
+                        bannerPx.innerText = `$${formatNumber(lastPx)}`;
 
-                        // Update Banner
-                        const lastPx = data.current_price || closes[closes.length - 1];
                         document.getElementById('banner-symbol').innerText = `${asset}/USD`;
-                        document.getElementById('banner-price').innerText = `$${formatNumber(lastPx)}`;
-                        
-                        const highs = data.candles.map(c => c.h);
-                        const lows = data.candles.map(c => c.l);
+                        const highs = formattedCandles.map(c => c.high);
+                        const lows = formattedCandles.map(c => c.low);
                         document.getElementById('banner-high').innerText = `$${formatNumber(Math.max(...highs))}`;
                         document.getElementById('banner-low').innerText = `$${formatNumber(Math.min(...lows))}`;
                         
                         const rsi = data.indicators?.rsi ? data.indicators.rsi[data.indicators.rsi.length - 1] : null;
                         document.getElementById('banner-rsi').innerText = rsi ? rsi.toFixed(1) : 'N/A';
-                        
-                        const signalPill = document.getElementById('banner-signal-pill');
-                        signalPill.innerText = data.ai_signal || 'HOLD';
-                        signalPill.className = `signal-pill ${data.ai_signal === 'BUY' ? 'signal-buy' : (data.ai_signal === 'SELL' ? 'signal-sell' : 'signal-hold')}`;
-                        
-                        document.getElementById('banner-rationale').innerText = data.rationale || 'Analyzing real-time indicators...';
                     }
                 }
             } catch (err) {
-                console.log('Error fetching live candles:', err);
+                console.log('Candle fetch error:', err);
             }
         }
 
@@ -1140,68 +1013,140 @@
                 const res = await fetch('/api/status');
                 if (res.ok) {
                     const data = await res.json();
-                    if (data.total_value) {
-                        document.getElementById('val-account-value').innerText = `$${formatNumber(data.total_value)}`;
+                    if (data.account_value) {
+                        document.getElementById('val-account-value').innerText = `$${formatNumber(data.account_value)}`;
                     }
-                    if (data.sharpe !== undefined) {
-                        document.getElementById('val-sharpe').innerText = Number(data.sharpe).toFixed(2);
+                    if (data.cash_balance !== undefined) {
+                        document.getElementById('val-cash-balance').innerText = `Available Cash: $${formatNumber(data.cash_balance)} USDC`;
                     }
                     if (data.positions) {
                         renderPositions(data.positions);
                     }
-                }
-            } catch (err) {
-                console.log('Status error:', err);
-            }
-            fetchDiary();
-            fetchLogs();
-            fetchMarketsList();
-        }
-
-        async function fetchDiary() {
-            try {
-                const res = await fetch('/diary?limit=15');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.entries && data.entries.length > 0) {
-                        renderDiary(data.entries.reverse());
-                        return;
+                    if (data.deposit_address) {
+                        document.getElementById('deposit-address-text').innerText = data.deposit_address;
                     }
                 }
             } catch (e) {}
-            renderDiary([
-                { timestamp: new Date().toISOString(), asset: 'BTC', action: 'hold', rationale: 'Live 5m chart holding above EMA20. MACD neutral. Waiting for breakout confirmation.' },
-                { timestamp: new Date(Date.now() - 300000).toISOString(), asset: 'xyz:GOLD', action: 'buy', rationale: 'Live RSI oversold (34.2) + VWAP rebound. Risk manager validated 5% allocation & 5% SL.' }
-            ]);
+            fetchMarketsList();
         }
 
-        async function fetchLogs() {
+        async function fetchMarketsList() {
             try {
-                const res = await fetch('/logs?limit=1000');
+                const res = await fetch('/api/markets');
                 if (res.ok) {
-                    const text = await res.text();
-                    document.getElementById('log-terminal').innerText = text || 'No recent log events.';
-                    const term = document.getElementById('log-terminal');
-                    term.scrollTop = term.scrollHeight;
+                    const data = await res.json();
+                    allMarkets = data.markets || [];
+                    document.getElementById('market-count-badge').innerText = `${allMarkets.length} Live`;
+                    renderWatchlistTable(allMarkets);
                 }
             } catch (e) {}
         }
 
-        async function triggerTradingLoop() {
-            const btn = document.getElementById('btn-trigger-loop');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span> Executing...';
+        function renderWatchlistTable(markets) {
+            const tbody = document.getElementById('watchlist-tbody');
+            tbody.innerHTML = markets.slice(0, 40).map(m => `
+                <tr class="${m.symbol === currentAsset ? 'active-row' : ''}" onclick="selectSymbol('${m.symbol}')">
+                    <td style="font-weight: 700; color: #fff;">${m.symbol}</td>
+                    <td class="mono" style="color: var(--accent-cyan);">$${formatNumber(m.price)}</td>
+                    <td><span class="signal-pill signal-hold">WATCH</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function selectSymbol(symbol) {
+            currentAsset = symbol;
+            document.getElementById('global-search').value = symbol;
+            document.getElementById('search-dropdown').classList.remove('active');
+            fetchCandles(currentAsset, currentInterval);
+        }
+
+        function setIntervalPeriod(period) {
+            currentInterval = period;
+            fetchCandles(currentAsset, currentInterval);
+        }
+
+        async function toggleAgentAutoPilot(enabled) {
             try {
-                const res = await fetch('/api/trigger', { method: 'POST' });
-                const json = await res.json();
-                alert(json.message || 'Loop executed successfully');
+                const res = await fetch('/api/agent/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled })
+                });
+                const data = await res.json();
+                document.getElementById('val-agent-status').innerText = enabled ? 'AUTO-TRADING ACTIVE' : 'AGENT PAUSED';
+                document.getElementById('val-agent-status').style.color = enabled ? 'var(--green-light)' : 'var(--text-muted)';
+            } catch (e) {}
+        }
+
+        // AI Chatbot Interactivity
+        function toggleChatDrawer() {
+            document.getElementById('chatbot-drawer').classList.toggle('minimized');
+        }
+
+        function quickAsk(msg) {
+            document.getElementById('chat-input').value = msg;
+            sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, asset: currentAsset })
+                });
+                const data = await res.json();
+                chatBox.innerHTML += `<div class="chat-msg bot">${data.reply}</div>`;
             } catch (e) {
-                alert('Trigger signal sent to trading loop.');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Run AI Loop';
-                fetchState();
+                chatBox.innerHTML += `<div class="chat-msg bot">Error communicating with AI engine.</div>`;
             }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Deposit & Withdraw Modals
+        function openDepositModal() { document.getElementById('deposit-modal').classList.add('active'); }
+        function openWithdrawModal() { document.getElementById('withdraw-modal').classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        async function submitDeposit() {
+            const amount = parseFloat(document.getElementById('deposit-amount-input').value);
+            if (!amount || amount <= 0) return alert('Enter valid USDC amount');
+            try {
+                const res = await fetch('/api/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount })
+                });
+                const data = await res.json();
+                alert(data.message);
+                closeModal('deposit-modal');
+                fetchState();
+            } catch (e) {}
+        }
+
+        async function submitWithdraw() {
+            const amount = parseFloat(document.getElementById('withdraw-amount-input').value);
+            if (!amount || amount <= 0) return alert('Enter valid USDC amount');
+            try {
+                const res = await fetch('/api/withdraw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount })
+                });
+                const data = await res.json();
+                alert(data.message);
+                closeModal('withdraw-modal');
+                fetchState();
+            } catch (e) {}
         }
 
         function renderPositions(positions) {
@@ -1212,7 +1157,7 @@
             }
             tbody.innerHTML = positions.map(p => `
                 <tr>
-                    <td style="font-weight: 700; color: #ffffff;">${p.symbol}</td>
+                    <td style="font-weight: 700; color: #fff;">${p.symbol}</td>
                     <td><span class="signal-pill ${Number(p.quantity) > 0 ? 'signal-buy' : 'signal-sell'}">${Number(p.quantity) > 0 ? 'LONG' : 'SHORT'}</span></td>
                     <td class="mono">${Math.abs(p.quantity)}</td>
                     <td class="mono">$${formatNumber(p.entry_price)}</td>
@@ -1223,46 +1168,22 @@
             `).join('');
         }
 
-        function renderDiary(entries) {
-            const feed = document.getElementById('diary-feed');
-            feed.innerHTML = entries.map(e => `
-                <div class="diary-card">
-                    <div class="diary-meta">
-                        <span>${new Date(e.timestamp).toLocaleTimeString()}</span>
-                        <span style="font-weight: 700; color: #ffffff;">${e.asset || 'GENERAL'}</span>
-                        <span class="signal-pill ${e.action === 'buy' ? 'signal-buy' : (e.action === 'sell' ? 'signal-sell' : 'signal-hold')}">${e.action}</span>
-                    </div>
-                    <div class="diary-rationale">
-                        ${e.rationale || e.reasoning || 'Executed strategy check.'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
         function formatNumber(num) {
             if (num === null || num === undefined) return '0.00';
             const n = Number(num);
-            if (n >= 1000) {
-                return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            } else if (n >= 1) {
-                return n.toFixed(2);
-            } else {
-                return n.toFixed(4);
-            }
+            if (n >= 1000) return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            return n.toFixed(2);
         }
 
-        // DOM Ready Initializer
         window.addEventListener('DOMContentLoaded', () => {
-            initChart();
-            fetchMarketsList();
-            fetchCandles(currentAsset, currentInterval);
+            initTradingViewChart();
             fetchState();
-            
-            // Auto refresh every 5 seconds for live market tickers
+            fetchCandles(currentAsset, currentInterval);
+
             setInterval(() => {
                 fetchCandles(currentAsset, currentInterval);
                 fetchState();
-            }, 5000);
+            }, 3000);
         });
     </script>
 </body>
