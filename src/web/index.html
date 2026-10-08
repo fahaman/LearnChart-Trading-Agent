@@ -3,45 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LearnChart AI Trading Agent | Hyperliquid Terminal</title>
+    <title>LearnChart AI Trading Terminal | Hyperliquid</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Charting Libraries: TradingView Lightweight Charts & Chart.js -->
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lightweight Charts (Pinned Stable Version) & TradingView JS -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
 
     <style>
         :root {
-            /* Ultra High-Contrast Dark Theme */
-            --bg-dark: #07090F;
-            --bg-card: rgba(13, 18, 33, 0.88);
-            --bg-card-hover: rgba(23, 31, 54, 0.95);
-            --bg-search: rgba(23, 31, 54, 0.7);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --border-highlight: rgba(124, 58, 237, 0.55);
+            /* Palette Derived Directly From User Reference Image (No Gradients) */
+            --bg-dark: #1E222A;         /* Primary Deep Slate */
+            --bg-card: #2D333C;         /* Secondary Medium Slate Panel */
+            --bg-card-hover: #383E48;   /* Panel Hover State */
+            --bg-input: #232830;        /* Inset Input Background */
             
-            --text-primary: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
+            --border-color: #3B424E;    /* Clean Border */
+            --border-highlight: #F7C95C;/* Gold Border Accent */
             
-            --accent-violet: #7C3AED;
-            --accent-indigo: #6366F1;
-            --accent-cyan: #06B6D4;
+            --accent-gold: #F7C95C;     /* Warm Gold / Yellow Primary Accent */
+            --accent-gold-hover: #E5B74A;
+            --accent-gold-bg: rgba(247, 201, 92, 0.12);
             
-            --green-glow: #10B981;
-            --green-light: #34D399;
-            --green-bg: rgba(16, 185, 129, 0.16);
+            --text-primary: #F0F0F2;    /* Soft Off-White Text */
+            --text-secondary: #9DA5B4;  /* Muted Slate Text */
+            --text-dark: #1E222A;       /* Dark Text for Gold Buttons */
             
-            --red-glow: #F43F5E;
-            --red-light: #FB7185;
-            --red-bg: rgba(244, 63, 94, 0.16);
+            /* Functional Signal Colors (Solid & Flat) */
+            --green-up: #22C55E;
+            --green-bg: rgba(34, 197, 94, 0.14);
             
-            --amber-glow: #F59E0B;
-            --amber-bg: rgba(245, 158, 11, 0.16);
+            --red-down: #EF4444;
+            --red-bg: rgba(239, 68, 68, 0.14);
             
-            --font-sans: 'Outfit', sans-serif;
+            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
@@ -53,40 +52,34 @@
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.20) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%);
             color: var(--text-primary);
             font-family: var(--font-sans);
             min-height: 100vh;
             padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Glassmorphism Panels */
-        .glass-panel {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+        /* Clean Panel Cards - No Gradients */
+        .card-panel {
+            background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
-            transition: border-color 0.2s ease, transform 0.2s ease;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.15s ease, background-color 0.15s ease;
         }
 
-        .glass-panel:hover {
-            border-color: rgba(124, 58, 237, 0.4);
+        .card-panel:hover {
+            border-color: #4A5260;
         }
 
-        /* Header Navigation */
+        /* Header Navigation Bar */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 32px;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(7, 9, 15, 0.95);
-            backdrop-filter: blur(24px);
+            padding: 14px 28px;
+            background-color: var(--bg-dark);
+            border-bottom: 2px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 200;
@@ -95,30 +88,28 @@
         .brand-section {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
 
         .brand-icon {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-gold);
+            color: var(--text-dark);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 20px;
-            color: #ffffff;
-            box-shadow: 0 0 24px rgba(124, 58, 237, 0.5);
+            font-size: 18px;
+            letter-spacing: -0.5px;
         }
 
         .brand-title h1 {
-            font-size: 19px;
+            font-size: 18px;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(to right, #FFFFFF, #CBD5E1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
         }
 
         .brand-title p {
@@ -130,29 +121,28 @@
         /* Search Container */
         .header-search-container {
             position: relative;
-            width: 340px;
+            width: 320px;
         }
 
         .search-input-wrap {
             display: flex;
             align-items: center;
-            background: var(--bg-search);
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 8px 16px;
+            border-radius: 8px;
+            padding: 8px 14px;
             gap: 10px;
         }
 
         .search-input-wrap:focus-within {
-            border-color: var(--accent-violet);
-            box-shadow: 0 0 16px rgba(124, 58, 237, 0.4);
+            border-color: var(--accent-gold);
         }
 
         .search-input {
             background: transparent;
             border: none;
             outline: none;
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 13px;
             font-weight: 500;
             width: 100%;
@@ -160,16 +150,17 @@
 
         .search-dropdown {
             position: absolute;
-            top: calc(100% + 8px);
+            top: calc(100% + 6px);
             left: 0;
             width: 100%;
-            max-height: 300px;
+            max-height: 280px;
             overflow-y: auto;
-            background: rgba(13, 18, 33, 0.96);
-            border: 1px solid var(--border-highlight);
-            border-radius: 12px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--accent-gold);
+            border-radius: 8px;
             z-index: 300;
             display: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
         .search-dropdown.active { display: block; }
@@ -178,77 +169,84 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 16px;
+            padding: 10px 14px;
             cursor: pointer;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
         }
 
-        .dropdown-item:hover { background: rgba(124, 58, 237, 0.2); }
+        .dropdown-item:hover { background-color: var(--bg-card-hover); }
 
         .status-strip {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
+        /* Clean Flat Buttons */
         .btn {
-            background: linear-gradient(135deg, var(--accent-violet), var(--accent-indigo));
-            color: #ffffff;
+            background-color: var(--accent-gold);
+            color: var(--text-dark);
             border: none;
             padding: 9px 16px;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: 8px;
+            font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.55);
+            background-color: var(--accent-gold-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-green {
-            background: linear-gradient(135deg, #10B981, #059669);
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+            background-color: var(--green-up);
+            color: #ffffff;
         }
+        .btn-green:hover { background-color: #16A34A; }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background-color: var(--bg-card);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background-color: var(--bg-card-hover);
+            border-color: var(--accent-gold);
         }
 
-        /* Container Layout */
+        /* Main Layout Container */
         .container {
-            max-width: 1680px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 24px 32px;
+            padding: 24px 28px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
 
-        /* Metric Summary Grid */
+        /* Metrics Grid */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 16px;
         }
 
         .metric-card {
-            padding: 18px 20px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            overflow: hidden;
-            min-height: 105px;
+            min-height: 100px;
         }
 
         .metric-card::before {
@@ -258,45 +256,45 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: var(--accent-violet);
+            background-color: var(--accent-gold);
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
         }
 
-        .metric-card.green::before { background: var(--green-glow); }
-        .metric-card.cyan::before { background: var(--accent-cyan); }
-        .metric-card.amber::before { background: var(--amber-glow); }
+        .metric-card.green::before { background-color: var(--green-up); }
+        .metric-card.red::before { background-color: var(--red-down); }
 
         .metric-label {
             font-size: 11.5px;
             color: var(--text-secondary);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.5px;
         }
 
         .metric-value {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             font-family: var(--font-mono);
             letter-spacing: -0.5px;
-            color: #ffffff;
+            color: var(--text-primary);
             margin-top: 4px;
         }
 
         .metric-sub {
             font-size: 12px;
             margin-top: 6px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-weight: 600;
         }
 
-        .txt-green { color: var(--green-light); }
-        .txt-red { color: var(--red-light); }
-        .txt-amber { color: var(--amber-glow); }
-        .txt-cyan { color: var(--accent-cyan); }
+        .txt-gold { color: var(--accent-gold); }
+        .txt-green { color: var(--green-up); }
+        .txt-red { color: var(--red-down); }
 
-        /* Selected Asset Banner */
+        /* Asset Banner Header */
         .asset-banner {
             padding: 16px 24px;
             display: flex;
@@ -304,14 +302,15 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.16), rgba(6, 182, 212, 0.08));
-            border: 1px solid var(--border-highlight);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent-gold);
         }
 
         .asset-symbol-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -321,7 +320,7 @@
             font-family: var(--font-mono);
             font-size: 24px;
             font-weight: 800;
-            color: var(--accent-cyan);
+            color: var(--accent-gold);
         }
 
         /* Chart Toolbar */
@@ -336,11 +335,11 @@
         }
 
         .tool-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-secondary);
             padding: 6px 12px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
@@ -348,51 +347,80 @@
         }
 
         .tool-btn.active, .tool-btn:hover {
-            background: var(--accent-violet);
-            color: #ffffff;
-            border-color: var(--accent-violet);
+            background-color: var(--accent-gold);
+            color: var(--text-dark);
+            border-color: var(--accent-gold);
         }
 
-        /* Chart Wrapper */
+        /* Robust Chart Wrapper */
         .chart-container-wrap {
             position: relative;
-            height: 420px;
+            height: 440px;
             width: 100%;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            background: #07090F;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
         }
 
         #tv-chart-container {
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #tv-embed-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        .chart-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(30, 34, 42, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 10;
         }
 
         /* Dashboard Split Layout */
         .dashboard-split {
             display: grid;
             grid-template-columns: 2.3fr 1fr;
-            gap: 24px;
+            gap: 20px;
         }
 
-        @media (max-width: 1280px) {
+        @media (max-width: 1200px) {
             .dashboard-split { grid-template-columns: 1fr; }
         }
 
         /* Watchlist */
         .watchlist-module {
-            padding: 24px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-height: 560px;
+            gap: 14px;
+            max-height: 540px;
         }
 
         .table-responsive {
             overflow-x: auto;
             overflow-y: auto;
-            max-height: 420px;
+            max-height: 400px;
             width: 100%;
         }
 
@@ -400,80 +428,81 @@
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 13.5px;
+            font-size: 13px;
         }
 
         th {
-            padding: 10px 14px;
-            color: var(--text-muted);
-            font-weight: 600;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            font-weight: 700;
             text-transform: uppercase;
             font-size: 11px;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
-            background: rgba(13, 18, 33, 0.98);
+            background-color: var(--bg-card);
+            z-index: 5;
         }
 
         td {
-            padding: 12px 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        tr { cursor: pointer; transition: background 0.15s ease; }
-        tr:hover td { background: var(--bg-card-hover); }
-        tr.active-row td { background: rgba(124, 58, 237, 0.25); }
+        tr { cursor: pointer; transition: background-color 0.15s ease; }
+        tr:hover td { background-color: var(--bg-card-hover); }
+        tr.active-row td { background-color: var(--accent-gold-bg); border-left: 3px solid var(--accent-gold); }
 
         .mono { font-family: var(--font-mono); }
 
         .signal-pill {
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 3px 8px;
+            border-radius: 4px;
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
+            display: inline-block;
         }
 
-        .signal-buy { background: var(--green-bg); color: var(--green-light); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .signal-sell { background: var(--red-bg); color: var(--red-light); border: 1px solid rgba(244, 63, 94, 0.3); }
-        .signal-hold { background: rgba(148, 163, 184, 0.15); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .signal-buy { background-color: var(--green-bg); color: var(--green-up); border: 1px solid var(--green-up); }
+        .signal-sell { background-color: var(--red-bg); color: var(--red-down); border: 1px solid var(--red-down); }
+        .signal-hold { background-color: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border-color); }
 
         /* Floating AI Chatbot Button & Panel */
         .chat-floating-btn {
             position: fixed;
             bottom: 24px;
             right: 24px;
-            background: linear-gradient(135deg, var(--accent-violet), var(--accent-indigo));
-            color: #ffffff;
+            background-color: var(--accent-gold);
+            color: var(--text-dark);
             padding: 12px 20px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.5);
+            border-radius: 24px;
+            font-weight: 800;
+            font-size: 13.5px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
             cursor: pointer;
             z-index: 450;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.2s ease;
+            gap: 8px;
+            transition: background-color 0.15s ease, transform 0.15s ease;
         }
 
         .chat-floating-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 40px rgba(124, 58, 237, 0.7);
+            background-color: var(--accent-gold-hover);
+            transform: translateY(-2px);
         }
 
         .ai-chatbot-drawer {
             position: fixed;
-            bottom: 80px;
+            bottom: 76px;
             right: 24px;
             width: 380px;
-            height: 500px;
-            background: rgba(13, 18, 33, 0.98);
-            backdrop-filter: blur(24px);
-            border: 1px solid var(--border-highlight);
-            border-radius: 18px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+            height: 490px;
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
             display: none;
             flex-direction: column;
             z-index: 500;
@@ -486,11 +515,12 @@
 
         .chat-header {
             padding: 14px 18px;
-            background: linear-gradient(135deg, var(--accent-violet), var(--accent-indigo));
+            background-color: var(--bg-dark);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #ffffff;
+            color: var(--text-primary);
             font-weight: 700;
             font-size: 14px;
         }
@@ -501,90 +531,109 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             font-size: 13px;
         }
 
         .chat-msg {
-            padding: 12px 14px;
-            border-radius: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
             line-height: 1.5;
-            max-width: 90%;
+            max-width: 88%;
             white-space: pre-wrap;
         }
 
         .chat-msg.user {
-            background: var(--accent-violet);
-            color: #ffffff;
+            background-color: var(--accent-gold);
+            color: var(--text-dark);
             align-self: flex-end;
-            border-bottom-right-radius: 2px;
+            font-weight: 600;
         }
 
         .chat-msg.bot {
-            background: rgba(255, 255, 255, 0.05);
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
             align-self: flex-start;
-            border-bottom-left-radius: 2px;
         }
 
         .chat-prompt-chips {
             display: flex;
             gap: 6px;
             overflow-x: auto;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 14px;
+            background-color: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
         }
 
         .chip {
             padding: 4px 10px;
-            border-radius: 14px;
-            background: rgba(124, 58, 237, 0.2);
-            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 12px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
             color: var(--text-primary);
-            font-size: 11.5px;
+            font-size: 11px;
+            font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
         }
 
+        .chip:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
         .chat-input-row {
-            padding: 12px 16px;
+            padding: 12px 14px;
             display: flex;
             gap: 8px;
             border-top: 1px solid var(--border-color);
-            background: rgba(0, 0, 0, 0.3);
+            background-color: var(--bg-dark);
         }
 
         .chat-input {
             flex: 1;
-            background: transparent;
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 6px;
             padding: 8px 12px;
-            color: #ffffff;
+            color: var(--text-primary);
             outline: none;
             font-family: var(--font-sans);
             font-size: 13px;
         }
 
+        .chat-input:focus { border-color: var(--accent-gold); }
+
         /* Modal Overlays */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
+            background-color: rgba(0, 0, 0, 0.75);
             display: flex; align-items: center; justify-content: center;
             z-index: 1000;
             opacity: 0; pointer-events: none;
-            transition: opacity 0.25s ease;
+            transition: opacity 0.2s ease;
         }
 
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
         .modal-content {
-            width: 90%; max-width: 480px;
-            padding: 28px;
-            display: flex; flex-direction: column; gap: 20px;
+            width: 90%; max-width: 440px;
+            padding: 24px;
+            display: flex; flex-direction: column; gap: 16px;
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -595,7 +644,7 @@
         <div class="brand-section">
             <div class="brand-icon">LC</div>
             <div class="brand-title">
-                <h1>LearnChart AI Terminal</h1>
+                <h1>LearnChart Trading Agent</h1>
                 <p>Hyperliquid Real-Time Perpetuals Engine</p>
             </div>
         </div>
@@ -603,21 +652,21 @@
         <!-- Global Search -->
         <div class="header-search-container">
             <div class="search-input-wrap">
-                <svg width="18" height="18" fill="none" stroke="var(--text-muted)" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" id="global-search" class="search-input" placeholder="Search crypto (BTC, ETH, SOL, HYPE)..." autocomplete="off">
+                <svg width="16" height="16" fill="none" stroke="var(--text-secondary)" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input type="text" id="global-search" class="search-input" placeholder="Search markets (BTC, ETH, SOL, HYPE)..." autocomplete="off">
             </div>
             <div id="search-dropdown" class="search-dropdown"></div>
         </div>
 
         <div class="status-strip">
             <button class="btn btn-green" onclick="openDepositModal()">
-                💰 Deposit Funds
+                💰 Deposit
             </button>
             <button class="btn btn-secondary" onclick="openWithdrawModal()">
                 💸 Withdraw
             </button>
             <button class="btn" id="btn-trigger-loop" onclick="triggerTradingLoop()">
-                ⚡ Run AI Loop
+                ⚡ AI Trade Loop
             </button>
         </div>
     </header>
@@ -627,48 +676,37 @@
 
         <!-- Metrics Overview Grid -->
         <div class="metrics-grid">
-            <div class="glass-panel metric-card green">
-                <div class="metric-header">
-                    <span class="metric-label">Total Portfolio Equity</span>
-                    <svg width="18" height="18" fill="none" stroke="var(--green-light)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
+            <div class="card-panel metric-card green">
+                <div class="metric-label">Total Portfolio Equity</div>
                 <div class="metric-value" id="val-account-value">$10,542.80</div>
                 <div class="metric-sub txt-green" id="val-cash-balance">Cash: $10,000.00 USDC</div>
             </div>
 
-            <div class="glass-panel metric-card cyan">
-                <div class="metric-header">
+            <div class="card-panel metric-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span class="metric-label">AI Agent Auto-Pilot</span>
-                    <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="toggle-agent-checkbox" checked onchange="toggleAgentAutoPilot(this.checked)" style="width: 16px; height: 16px; accent-color: var(--accent-violet);">
-                    </label>
+                    <input type="checkbox" id="toggle-agent-checkbox" checked onchange="toggleAgentAutoPilot(this.checked)" style="width: 16px; height: 16px; accent-color: var(--accent-gold); cursor: pointer;">
                 </div>
-                <div class="metric-value" id="val-agent-status" style="font-size: 20px; color: var(--green-light);">AUTO-TRADING ACTIVE</div>
-                <div class="metric-sub txt-cyan">Claude AI signs & executes trades</div>
+                <div class="metric-value txt-gold" id="val-agent-status" style="font-size: 19px;">AUTO-TRADING ACTIVE</div>
+                <div class="metric-sub" style="color: var(--text-secondary)">Autonomous trade execution & signals</div>
             </div>
 
-            <div class="glass-panel metric-card amber">
-                <div class="metric-header">
-                    <span class="metric-label">Performance Metric</span>
-                    <svg width="18" height="18" fill="none" stroke="var(--amber-glow)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6a2 2 0 01-2 2h-2a2 2 0 01-2-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                </div>
-                <div class="metric-value" id="val-sharpe">2.38</div>
-                <div class="metric-sub txt-amber">Sharpe Ratio (Annualized)</div>
+            <div class="card-panel metric-card">
+                <div class="metric-label">Sharpe Ratio</div>
+                <div class="metric-value txt-gold" id="val-sharpe">2.38</div>
+                <div class="metric-sub" style="color: var(--text-secondary)">Annualized Performance Index</div>
             </div>
 
-            <div class="glass-panel metric-card">
-                <div class="metric-header">
-                    <span class="metric-label">Safety Guards</span>
-                    <svg width="18" height="18" fill="none" stroke="var(--accent-violet)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-                <div class="metric-value txt-green" style="font-size: 20px;">100% PROTECTED</div>
-                <div class="metric-sub" style="color: var(--text-muted)">8 Risk Rules Active</div>
+            <div class="card-panel metric-card green">
+                <div class="metric-label">Risk Protection</div>
+                <div class="metric-value txt-green" style="font-size: 19px;">100% PROTECTED</div>
+                <div class="metric-sub" style="color: var(--text-secondary)">8 Hardcoded Risk Guardrails Active</div>
             </div>
         </div>
 
         <!-- Selected Asset Active Banner -->
-        <div class="glass-panel asset-banner" id="active-asset-banner">
-            <div style="display: flex; align-items: center; gap: 18px;">
+        <div class="card-panel asset-banner" id="active-asset-banner">
+            <div style="display: flex; align-items: center; gap: 16px;">
                 <div class="asset-symbol-title">
                     <span id="banner-symbol">BTC/USD</span>
                     <span class="signal-pill signal-buy" id="banner-signal-pill">BUY</span>
@@ -678,57 +716,70 @@
             
             <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
                 <div style="display: flex; flex-direction: column;">
-                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">24h High</span>
-                    <span id="banner-high" style="font-family: var(--font-mono); font-weight: 700;">$84,120.00</span>
+                    <span style="font-size: 11px; color: var(--text-secondary); font-weight: 700;">24h High</span>
+                    <span id="banner-high" class="mono" style="font-weight: 700;">$84,120.00</span>
                 </div>
                 <div style="display: flex; flex-direction: column;">
-                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">24h Low</span>
-                    <span id="banner-low" style="font-family: var(--font-mono); font-weight: 700;">$82,450.00</span>
+                    <span style="font-size: 11px; color: var(--text-secondary); font-weight: 700;">24h Low</span>
+                    <span id="banner-low" class="mono" style="font-weight: 700;">$82,450.00</span>
                 </div>
                 <div style="display: flex; flex-direction: column;">
-                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Live RSI (14)</span>
-                    <span id="banner-rsi" style="font-family: var(--font-mono); font-weight: 700;">42.1</span>
+                    <span style="font-size: 11px; color: var(--text-secondary); font-weight: 700;">Live RSI (14)</span>
+                    <span id="banner-rsi" class="mono" style="font-weight: 700; color: var(--accent-gold);">42.1</span>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Split: TradingView Chart & Watchlist -->
+        <!-- Dashboard Split: TradingView Technical Chart & Watchlist -->
         <div class="dashboard-split">
             
-            <!-- Real-Time TradingView Technical Chart Module -->
-            <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+            <!-- Real-Time Chart Module -->
+            <div class="card-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
                 <div class="chart-toolbar">
+                    <!-- Engine Type Switcher -->
                     <div style="display: flex; gap: 6px;">
-                        <button class="tool-btn active" id="btn-type-candle" onclick="setChartType('candle')">📊 Candlesticks</button>
-                        <button class="tool-btn" id="btn-type-line" onclick="setChartType('line')">📈 Line Chart</button>
+                        <button class="tool-btn active" id="btn-engine-lw" onclick="setEngineMode('lw')">📊 Technical Chart</button>
+                        <button class="tool-btn" id="btn-engine-tv" onclick="setEngineMode('tv')">📺 TradingView Widget</button>
                     </div>
 
-                    <div style="display: flex; gap: 6px;">
+                    <!-- Chart Style Switcher -->
+                    <div id="lw-controls-style" style="display: flex; gap: 6px;">
+                        <button class="tool-btn active" id="btn-type-candle" onclick="setChartType('candle')">Candles</button>
+                        <button class="tool-btn" id="btn-type-line" onclick="setChartType('line')">Line</button>
+                    </div>
+
+                    <!-- Indicator Toggles -->
+                    <div id="lw-controls-ind" style="display: flex; gap: 6px;">
                         <button class="tool-btn active" id="btn-ind-ema20" onclick="toggleIndicator('ema20')">EMA 20</button>
                         <button class="tool-btn active" id="btn-ind-ema50" onclick="toggleIndicator('ema50')">EMA 50</button>
                     </div>
 
-                    <div style="display: flex; gap: 6px;">
-                        <button class="tool-btn" onclick="setIntervalPeriod('1m')">1m</button>
-                        <button class="tool-btn active" onclick="setIntervalPeriod('5m')">5m</button>
-                        <button class="tool-btn" onclick="setIntervalPeriod('15m')">15m</button>
-                        <button class="tool-btn" onclick="setIntervalPeriod('1h')">1h</button>
+                    <!-- Timeframes -->
+                    <div style="display: flex; gap: 4px;">
+                        <button class="tool-btn" id="tf-1m" onclick="setIntervalPeriod('1m')">1m</button>
+                        <button class="tool-btn active" id="tf-5m" onclick="setIntervalPeriod('5m')">5m</button>
+                        <button class="tool-btn" id="tf-15m" onclick="setIntervalPeriod('15m')">15m</button>
+                        <button class="tool-btn" id="tf-1h" onclick="setIntervalPeriod('1h')">1h</button>
                     </div>
                 </div>
 
                 <div class="chart-container-wrap">
                     <div id="tv-chart-container"></div>
+                    <div id="tv-embed-container"></div>
+                    <div class="chart-loading-overlay" id="chart-loading">
+                        <span>Loading Real-time Market Chart...</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Market Watchlist -->
-            <div class="glass-panel watchlist-module">
+            <div class="card-panel watchlist-module">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-weight: 700; font-size: 15px;">Live Markets</span>
-                    <span class="badge badge-info" id="market-count-badge">Loading...</span>
+                    <span class="badge" id="market-count-badge">Loading...</span>
                 </div>
                 
-                <input type="text" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 14px; color: #fff; outline: none; font-size: 13px;" id="watchlist-filter" placeholder="Filter coin symbol..." oninput="filterWatchlistTable()">
+                <input type="text" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px; color: var(--text-primary); outline: none; font-size: 13px;" id="watchlist-filter" placeholder="Filter symbol..." oninput="filterWatchlistTable()">
 
                 <div class="table-responsive">
                     <table>
@@ -740,7 +791,7 @@
                             </tr>
                         </thead>
                         <tbody id="watchlist-tbody">
-                            <tr><td colspan="3" style="text-align:center; padding:20px;">Loading live prices...</td></tr>
+                            <tr><td colspan="3" style="text-align:center; padding:20px; color: var(--text-secondary);">Loading prices...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -748,10 +799,11 @@
         </div>
 
         <!-- Section Grid: Active Positions & Safety Guards -->
-        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px;">
-            <div class="glass-panel" style="padding: 24px;">
-                <div style="font-weight: 700; font-size: 16px; margin-bottom: 16px;">
-                    Active Positions & Agent Delegated Trades
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px;">
+            <div class="card-panel" style="padding: 20px;">
+                <div style="font-weight: 700; font-size: 15px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Active Positions & Agent Delegated Trades</span>
+                    <span class="badge">Live Execution</span>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -767,33 +819,33 @@
                             </tr>
                         </thead>
                         <tbody id="positions-tbody">
-                            <!-- Populated dynamically -->
+                            <tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 20px;">No open positions</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Hardcoded Safety Guards Matrix -->
-            <div class="glass-panel" style="padding: 24px;">
-                <div style="font-weight: 700; font-size: 16px; margin-bottom: 16px;">
+            <!-- Risk Rules Matrix -->
+            <div class="card-panel" style="padding: 20px;">
+                <div style="font-weight: 700; font-size: 15px; margin-bottom: 14px;">
                     Hardcoded Risk & Protection Rules
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;">
-                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 12px; display: flex; justify-content: space-between;">
-                        <span style="font-size: 12px; color: var(--text-secondary);">Max Position</span>
-                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">20% Portfolio</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
+                    <div style="background-color: var(--bg-input); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Max Position</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-gold);">20% Portfolio</span>
                     </div>
-                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 12px; display: flex; justify-content: space-between;">
-                        <span style="font-size: 12px; color: var(--text-secondary);">Force Close</span>
-                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--red-light);">-20% PnL</span>
+                    <div style="background-color: var(--bg-input); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Force Close</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--red-down);">-20% PnL</span>
                     </div>
-                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 12px; display: flex; justify-content: space-between;">
-                        <span style="font-size: 12px; color: var(--text-secondary);">Max Leverage</span>
-                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--amber-glow);">10x Hard Cap</span>
+                    <div style="background-color: var(--bg-input); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Max Leverage</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-gold);">10x Cap</span>
                     </div>
-                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 12px; display: flex; justify-content: space-between;">
-                        <span style="font-size: 12px; color: var(--text-secondary);">Mandatory SL</span>
-                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--green-light);">5% Automatic</span>
+                    <div style="background-color: var(--bg-input); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Auto StopLoss</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--green-up);">5% Active</span>
                     </div>
                 </div>
             </div>
@@ -803,21 +855,20 @@
 
     <!-- Floating AI Chatbot Toggle Button -->
     <div class="chat-floating-btn" onclick="toggleChatDrawer()">
-        <span>🤖 Ask LearnChart AI</span>
+        <span>🤖 AI Trading Signal Assistant</span>
     </div>
 
-    <!-- Floating AI Signal Predictor Chatbot Drawer -->
+    <!-- Floating AI Chatbot Drawer -->
     <div class="ai-chatbot-drawer" id="chatbot-drawer">
         <div class="chat-header">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span>🤖 LearnChart AI Signal Predictor</span>
+                <span>🤖 LearnChart AI Signal Engine</span>
             </div>
-            <span style="cursor: pointer; font-size: 16px;" onclick="toggleChatDrawer()">✕</span>
+            <span style="cursor: pointer; font-size: 16px; font-weight: 700;" onclick="toggleChatDrawer()">✕</span>
         </div>
         
         <div class="chat-body" id="chat-box">
-            <div class="chat-msg bot">👋 Hello! I am your **LearnChart AI Signal Engine**. 
-Ask me to analyze any crypto asset, predict price trends, or calculate technical indicators!</div>
+            <div class="chat-msg bot">👋 Hello! I am your LearnChart AI Trading Engine. Ask me to analyze market trends, calculate RSI/EMA indicators, or suggest TP/SL parameters!</div>
         </div>
 
         <div class="chat-prompt-chips">
@@ -827,28 +878,28 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
         </div>
 
         <div class="chat-input-row">
-            <input type="text" class="chat-input" id="chat-input" placeholder="Ask AI for signal prediction..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Ask AI for trading signal..." onkeydown="if(event.key==='Enter') sendChatMessage()">
             <button class="btn" style="padding: 8px 14px;" onclick="sendChatMessage()">Send</button>
         </div>
     </div>
 
     <!-- Deposit USDC Modal -->
     <div class="modal-overlay" id="deposit-modal">
-        <div class="glass-panel modal-content">
+        <div class="card-panel modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="font-size: 18px; font-weight: 700;">💰 Deposit USDC Funds</h3>
-                <span style="cursor: pointer; font-size: 20px;" onclick="closeModal('deposit-modal')">✕</span>
+                <h3 style="font-size: 17px; font-weight: 700;">💰 Deposit USDC Funds</h3>
+                <span style="cursor: pointer; font-size: 18px; font-weight: 700;" onclick="closeModal('deposit-modal')">✕</span>
             </div>
-            <p style="font-size: 13px; color: var(--text-secondary);">Deposit USDC directly to your LearnChart trading wallet to enable automated agent execution.</p>
+            <p style="font-size: 12.5px; color: var(--text-secondary);">Deposit USDC to your trading account to enable automated strategy execution.</p>
             
-            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 14px; border-radius: 12px; font-family: var(--font-mono); font-size: 12px; word-break: break-all; color: var(--accent-cyan);">
-                Deposit Address (Arb / Hyperliquid):<br>
+            <div style="background-color: var(--bg-input); border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; word-break: break-all; color: var(--accent-gold);">
+                Deposit Address:<br>
                 <strong id="deposit-address-text">0x71C8b4F2D9914A3E940026e149B9057b54aA2B7e</strong>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Amount to Deposit (USDC)</label>
-                <input type="number" id="deposit-amount-input" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; color: #fff; font-family: var(--font-mono); outline: none;" placeholder="500">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Amount to Deposit (USDC)</label>
+                <input type="number" id="deposit-amount-input" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; color: var(--text-primary); font-family: var(--font-mono); outline: none;" placeholder="500">
             </div>
 
             <button class="btn btn-green" onclick="submitDeposit()">Confirm USDC Deposit</button>
@@ -857,27 +908,29 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
 
     <!-- Withdraw USDC Modal -->
     <div class="modal-overlay" id="withdraw-modal">
-        <div class="glass-panel modal-content">
+        <div class="card-panel modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="font-size: 18px; font-weight: 700;">💸 Withdraw USDC Funds</h3>
-                <span style="cursor: pointer; font-size: 20px;" onclick="closeModal('withdraw-modal')">✕</span>
+                <h3 style="font-size: 17px; font-weight: 700;">💸 Withdraw USDC Funds</h3>
+                <span style="cursor: pointer; font-size: 18px; font-weight: 700;" onclick="closeModal('withdraw-modal')">✕</span>
             </div>
-            <p style="font-size: 13px; color: var(--text-secondary);">Withdraw available cash balance to your external Web3 wallet.</p>
+            <p style="font-size: 12.5px; color: var(--text-secondary);">Withdraw available cash balance to your external Web3 wallet.</p>
 
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Withdrawal Amount (USDC)</label>
-                <input type="number" id="withdraw-amount-input" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; color: #fff; font-family: var(--font-mono); outline: none;" placeholder="100">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Withdrawal Amount (USDC)</label>
+                <input type="number" id="withdraw-amount-input" style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; color: var(--text-primary); font-family: var(--font-mono); outline: none;" placeholder="100">
             </div>
 
             <button class="btn" onclick="submitWithdraw()">Withdraw to Wallet</button>
         </div>
     </div>
 
-    <!-- TradingView Lightweight Charts & Interactivity Scripts -->
+    <!-- Core Charting & Dashboard Script -->
     <script>
         let currentAsset = 'BTC';
         let currentInterval = '5m';
         let chartType = 'candle';
+        let engineMode = 'lw'; // 'lw' (Lightweight Charts) or 'tv' (TradingView Embed Widget)
+        
         let tvChart = null;
         let mainSeries = null;
         let ema20Series = null;
@@ -886,82 +939,168 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
         let showEma50 = true;
         let allMarkets = [];
         let previousPrice = null;
+        let resizeObserver = null;
 
-        // Initialize TradingView Lightweight Chart
+        // Initialize Native Lightweight Chart with Robust Sizing & Fallbacks
         function initTradingViewChart() {
             const container = document.getElementById('tv-chart-container');
             container.innerHTML = '';
 
             try {
+                if (typeof LightweightCharts === 'undefined') {
+                    console.warn('LightweightCharts library not ready, falling back to TradingView widget');
+                    setEngineMode('tv');
+                    return;
+                }
+
+                const width = container.clientWidth || 800;
+                const height = container.clientHeight || 440;
+
                 tvChart = LightweightCharts.createChart(container, {
+                    width: width,
+                    height: height,
                     layout: {
-                        background: { type: 'solid', color: '#07090F' },
-                        textColor: '#94A3B8',
+                        background: { type: 'solid', color: '#232830' },
+                        textColor: '#9DA5B4',
                         fontFamily: 'Outfit, sans-serif'
                     },
                     grid: {
-                        vertLines: { color: 'rgba(255, 255, 255, 0.04)' },
-                        horzLines: { color: 'rgba(255, 255, 255, 0.04)' }
+                        vertLines: { color: '#2D333C' },
+                        horzLines: { color: '#2D333C' }
                     },
                     crosshair: {
                         mode: LightweightCharts.CrosshairMode.Normal,
                     },
                     rightPriceScale: {
-                        borderColor: 'rgba(255, 255, 255, 0.08)',
-                        autoScale: true
+                        borderColor: '#3B424E',
+                        autoScale: true,
                     },
                     timeScale: {
-                        borderColor: 'rgba(255, 255, 255, 0.08)',
+                        borderColor: '#3B424E',
                         timeVisible: true,
                         secondsVisible: false,
                     },
                 });
 
                 createSeries();
+
+                // Auto-resize logic on container geometry changes
+                if (resizeObserver) resizeObserver.disconnect();
+                resizeObserver = new ResizeObserver(entries => {
+                    if (!entries || !entries.length) return;
+                    const { width, height } = entries[0].contentRect;
+                    if (width > 0 && height > 0 && tvChart) {
+                        tvChart.applyOptions({ width: width, height: height });
+                    }
+                });
+                resizeObserver.observe(container);
+
             } catch (err) {
-                console.log('Lightweight charts init error:', err);
+                console.error('Lightweight charts init error:', err);
+                setEngineMode('tv');
             }
         }
 
         function createSeries() {
             if (!tvChart) return;
 
-            if (chartType === 'candle') {
-                mainSeries = tvChart.addCandlestickSeries({
-                    upColor: '#10B981',
-                    downColor: '#F43F5E',
-                    borderVisible: false,
-                    wickUpColor: '#10B981',
-                    wickDownColor: '#F43F5E',
+            try {
+                if (chartType === 'candle') {
+                    mainSeries = tvChart.addCandlestickSeries({
+                        upColor: '#22C55E',
+                        downColor: '#EF4444',
+                        borderVisible: false,
+                        wickUpColor: '#22C55E',
+                        wickDownColor: '#EF4444',
+                    });
+                } else {
+                    mainSeries = tvChart.addLineSeries({
+                        color: '#F7C95C',
+                        lineWidth: 3,
+                    });
+                }
+
+                ema20Series = tvChart.addLineSeries({
+                    color: '#22C55E',
+                    lineWidth: 1.5,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    visible: showEma20,
                 });
+
+                ema50Series = tvChart.addLineSeries({
+                    color: '#EF4444',
+                    lineWidth: 1.5,
+                    lineStyle: LightweightCharts.LineStyle.Dashed,
+                    visible: showEma50,
+                });
+            } catch (e) {
+                console.error('Failed to create series:', e);
+            }
+        }
+
+        function setEngineMode(mode) {
+            engineMode = mode;
+            document.getElementById('btn-engine-lw').classList.toggle('active', mode === 'lw');
+            document.getElementById('btn-engine-tv').classList.toggle('active', mode === 'tv');
+
+            const lwContainer = document.getElementById('tv-chart-container');
+            const tvEmbedContainer = document.getElementById('tv-embed-container');
+            const styleControls = document.getElementById('lw-controls-style');
+            const indControls = document.getElementById('lw-controls-ind');
+
+            if (mode === 'lw') {
+                lwContainer.style.display = 'block';
+                tvEmbedContainer.style.display = 'none';
+                styleControls.style.display = 'flex';
+                indControls.style.display = 'flex';
+                if (!tvChart) initTradingViewChart();
+                fetchCandles(currentAsset, currentInterval);
             } else {
-                mainSeries = tvChart.addLineSeries({
-                    color: '#7C3AED',
-                    lineWidth: 3,
-                });
+                lwContainer.style.display = 'none';
+                tvEmbedContainer.style.display = 'block';
+                styleControls.style.display = 'none';
+                indControls.style.display = 'none';
+                renderTradingViewWidget(currentAsset);
+            }
+        }
+
+        function renderTradingViewWidget(asset) {
+            const container = document.getElementById('tv-embed-container');
+            container.innerHTML = '';
+            document.getElementById('chart-loading').style.display = 'none';
+
+            let symbol = `BINANCE:${asset}USDT`;
+            if (asset === 'BTC' || asset === 'ETH' || asset === 'SOL' || asset === 'SUI') {
+                symbol = `BINANCE:${asset}USDT`;
             }
 
-            ema20Series = tvChart.addLineSeries({
-                color: '#10B981',
-                lineWidth: 1.5,
-                lineStyle: LightweightCharts.LineStyle.Dotted,
-                visible: showEma20,
-            });
-
-            ema50Series = tvChart.addLineSeries({
-                color: '#F59E0B',
-                lineWidth: 1.5,
-                lineStyle: LightweightCharts.LineStyle.Dashed,
-                visible: showEma50,
-            });
+            try {
+                new TradingView.widget({
+                    "autosize": true,
+                    "symbol": symbol,
+                    "interval": currentInterval.replace('m', '').replace('h', '60'),
+                    "timezone": "Etc/UTC",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "en",
+                    "toolbar_bg": "#232830",
+                    "enable_publishing": false,
+                    "allow_symbol_change": true,
+                    "container_id": "tv-embed-container"
+                });
+            } catch (e) {
+                container.innerHTML = `<div style="padding:40px; text-align:center; color: var(--text-secondary)">TradingView Embed Widget loading...</div>`;
+            }
         }
 
         function setChartType(type) {
             chartType = type;
             document.getElementById('btn-type-candle').classList.toggle('active', type === 'candle');
             document.getElementById('btn-type-line').classList.toggle('active', type === 'line');
-            initTradingViewChart();
-            fetchCandles(currentAsset, currentInterval);
+            if (engineMode === 'lw') {
+                initTradingViewChart();
+                fetchCandles(currentAsset, currentInterval);
+            }
         }
 
         function toggleIndicator(ind) {
@@ -977,6 +1116,9 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
         }
 
         async function fetchCandles(asset, interval) {
+            if (engineMode === 'tv') return;
+            const loadingOverlay = document.getElementById('chart-loading');
+
             try {
                 const res = await fetch(`/api/candles?asset=${asset}&interval=${interval}`);
                 if (res.ok) {
@@ -1025,17 +1167,14 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
                             ema50Series.setData(sortedEma50);
                         }
 
-                        // FIT TIME SCALE & AUTO SCALE VIEWPORT
                         if (tvChart) {
                             tvChart.timeScale().fitContent();
                             tvChart.priceScale('right').applyOptions({ autoScale: true });
                         }
 
-                        // Banner Stats
+                        // Banner Stats update
                         const lastPx = data.current_price || formattedCandles[formattedCandles.length - 1].close;
                         const bannerPx = document.getElementById('banner-price');
-                        
-                        previousPrice = lastPx;
                         bannerPx.innerText = `$${formatNumber(lastPx)}`;
 
                         document.getElementById('banner-symbol').innerText = `${asset}/USD`;
@@ -1044,12 +1183,14 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
                         document.getElementById('banner-high').innerText = `$${formatNumber(Math.max(...highs))}`;
                         document.getElementById('banner-low').innerText = `$${formatNumber(Math.min(...lows))}`;
                         
-                        const rsi = data.indicators?.rsi ? data.indicators.rsi[data.indicators.rsi.length - 1] : null;
+                        const rsi = data.indicators?.rsi14 ? data.indicators.rsi14[data.indicators.rsi14.length - 1] : null;
                         document.getElementById('banner-rsi').innerText = rsi ? rsi.toFixed(1) : 'N/A';
                     }
+                    loadingOverlay.style.display = 'none';
                 }
             } catch (err) {
-                console.log('Candle fetch error:', err);
+                console.error('Candle fetch error:', err);
+                loadingOverlay.style.display = 'none';
             }
         }
 
@@ -1081,7 +1222,7 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
                 if (res.ok) {
                     const data = await res.json();
                     allMarkets = data.markets || [];
-                    document.getElementById('market-count-badge').innerText = `${allMarkets.length} Live`;
+                    document.getElementById('market-count-badge').innerText = `${allMarkets.length} Coins`;
                     renderWatchlistTable(allMarkets);
                 }
             } catch (e) {}
@@ -1089,10 +1230,10 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
 
         function renderWatchlistTable(markets) {
             const tbody = document.getElementById('watchlist-tbody');
-            tbody.innerHTML = markets.slice(0, 40).map(m => `
+            tbody.innerHTML = markets.slice(0, 30).map(m => `
                 <tr class="${m.symbol === currentAsset ? 'active-row' : ''}" onclick="selectSymbol('${m.symbol}')">
-                    <td style="font-weight: 700; color: #fff;">${m.symbol}</td>
-                    <td class="mono" style="color: var(--accent-cyan);">$${formatNumber(m.price)}</td>
+                    <td style="font-weight: 700; color: var(--text-primary);">${m.symbol}</td>
+                    <td class="mono" style="color: var(--accent-gold);">$${formatNumber(m.price)}</td>
                     <td><span class="signal-pill signal-hold">WATCH</span></td>
                 </tr>
             `).join('');
@@ -1108,23 +1249,37 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
             currentAsset = symbol;
             document.getElementById('global-search').value = symbol;
             document.getElementById('search-dropdown').classList.remove('active');
-            fetchCandles(currentAsset, currentInterval);
+            if (engineMode === 'lw') {
+                fetchCandles(currentAsset, currentInterval);
+            } else {
+                renderTradingViewWidget(currentAsset);
+            }
         }
 
         function setIntervalPeriod(period) {
             currentInterval = period;
-            fetchCandles(currentAsset, currentInterval);
+            ['1m', '5m', '15m', '1h'].forEach(p => {
+                const btn = document.getElementById(`tf-${p}`);
+                if (btn) btn.classList.toggle('active', p === period);
+            });
+            if (engineMode === 'lw') {
+                fetchCandles(currentAsset, currentInterval);
+            } else {
+                renderTradingViewWidget(currentAsset);
+            }
         }
 
         async function toggleAgentAutoPilot(enabled) {
             try {
-                const res = await fetch('/api/agent/toggle', {
+                await fetch('/api/agent/toggle', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ enabled })
                 });
-                document.getElementById('val-agent-status').innerText = enabled ? 'AUTO-TRADING ACTIVE' : 'AGENT PAUSED';
-                document.getElementById('val-agent-status').style.color = enabled ? 'var(--green-light)' : 'var(--text-muted)';
+                const statusElem = document.getElementById('val-agent-status');
+                statusElem.innerText = enabled ? 'AUTO-TRADING ACTIVE' : 'AGENT PAUSED';
+                statusElem.className = enabled ? 'metric-value txt-gold' : 'metric-value';
+                statusElem.style.color = enabled ? 'var(--accent-gold)' : 'var(--text-secondary)';
             } catch (e) {}
         }
 
@@ -1156,9 +1311,26 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
                 const data = await res.json();
                 chatBox.innerHTML += `<div class="chat-msg bot">${data.reply}</div>`;
             } catch (e) {
-                chatBox.innerHTML += `<div class="chat-msg bot">Error communicating with AI engine.</div>`;
+                chatBox.innerHTML += `<div class="chat-msg bot">Error reaching AI signal engine.</div>`;
             }
             chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function triggerTradingLoop() {
+            const btn = document.getElementById('btn-trigger-loop');
+            btn.innerText = '⏳ Running AI Loop...';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/agent/loop', { method: 'POST' });
+                const data = await res.json();
+                alert(`AI Loop Completed:\n${data.summary || data.message || 'Cycle executed successfully'}`);
+                fetchState();
+            } catch (e) {
+                alert('AI loop execution failed');
+            } finally {
+                btn.innerText = '⚡ AI Trade Loop';
+                btn.disabled = false;
+            }
         }
 
         function openDepositModal() { document.getElementById('deposit-modal').classList.add('active'); }
@@ -1200,18 +1372,18 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
         function renderPositions(positions) {
             const tbody = document.getElementById('positions-tbody');
             if (!positions || positions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">No active positions open</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 20px;">No open positions</td></tr>`;
                 return;
             }
             tbody.innerHTML = positions.map(p => `
                 <tr>
-                    <td style="font-weight: 700; color: #fff;">${p.symbol}</td>
+                    <td style="font-weight: 700; color: var(--text-primary);">${p.symbol}</td>
                     <td><span class="signal-pill ${Number(p.quantity) > 0 ? 'signal-buy' : 'signal-sell'}">${Number(p.quantity) > 0 ? 'LONG' : 'SHORT'}</span></td>
                     <td class="mono">${Math.abs(p.quantity)}</td>
                     <td class="mono">$${formatNumber(p.entry_price)}</td>
-                    <td class="mono" style="color: var(--accent-cyan);">$${formatNumber(p.current_price)}</td>
+                    <td class="mono" style="color: var(--accent-gold);">$${formatNumber(p.current_price)}</td>
                     <td class="mono ${p.unrealized_pnl >= 0 ? 'txt-green' : 'txt-red'}">$${formatNumber(p.unrealized_pnl)}</td>
-                    <td><span class="badge badge-info">${p.leverage}x</span></td>
+                    <td><span class="badge">${p.leverage}x</span></td>
                 </tr>
             `).join('');
         }
@@ -1223,15 +1395,47 @@ Ask me to analyze any crypto asset, predict price trends, or calculate technical
             return n.toFixed(2);
         }
 
+        // Global Search Setup
+        const searchInput = document.getElementById('global-search');
+        const searchDropdown = document.getElementById('search-dropdown');
+
+        searchInput.addEventListener('input', (e) => {
+            const q = e.target.value.trim().toUpperCase();
+            if (!q) {
+                searchDropdown.classList.remove('active');
+                return;
+            }
+            const matches = allMarkets.filter(m => m.symbol.toUpperCase().includes(q)).slice(0, 8);
+            if (matches.length > 0) {
+                searchDropdown.innerHTML = matches.map(m => `
+                    <div class="dropdown-item" onclick="selectSymbol('${m.symbol}')">
+                        <span style="font-weight:700;">${m.symbol}</span>
+                        <span class="mono" style="color:var(--accent-gold);">$${formatNumber(m.price)}</span>
+                    </div>
+                `).join('');
+                searchDropdown.classList.add('active');
+            } else {
+                searchDropdown.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.header-search-container')) {
+                searchDropdown.classList.remove('active');
+            }
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
             initTradingViewChart();
             fetchState();
             fetchCandles(currentAsset, currentInterval);
 
             setInterval(() => {
-                fetchCandles(currentAsset, currentInterval);
+                if (engineMode === 'lw') {
+                    fetchCandles(currentAsset, currentInterval);
+                }
                 fetchState();
-            }, 3000);
+            }, 4000);
         });
     </script>
 </body>
